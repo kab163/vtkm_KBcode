@@ -1,0 +1,7 @@
+/home/users/kab163/vtkm_KBcode/MultiDevice/CMakeFiles/install/strip.dir
+/home/users/kab163/vtkm_KBcode/MultiDevice/CMakeFiles/install/local.dir
+/home/users/kab163/vtkm_KBcode/MultiDevice/CMakeFiles/SwitchDevice.dir
+/home/users/kab163/vtkm_KBcode/MultiDevice/CMakeFiles/rebuild_cache.dir
+/home/users/kab163/vtkm_KBcode/MultiDevice/CMakeFiles/install.dir
+/home/users/kab163/vtkm_KBcode/MultiDevice/CMakeFiles/edit_cache.dir
+/home/users/kab163/vtkm_KBcode/MultiDevice/CMakeFiles/list_install_components.dir
