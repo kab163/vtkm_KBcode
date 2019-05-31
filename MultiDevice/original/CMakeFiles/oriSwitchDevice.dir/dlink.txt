@@ -1,0 +1,1 @@
+/usr/local/cuda/bin/nvcc   --generate-code=arch=compute_35,code=sm_35  -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink CMakeFiles/oriSwitchDevice.dir/oriSwitchDevice.cxx.o -o CMakeFiles/oriSwitchDevice.dir/cmake_device_link.o 
