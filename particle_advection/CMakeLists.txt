@@ -13,11 +13,11 @@ project(ParticleAdvection CXX)
 #Find the VTK-m package
 find_package(VTKm REQUIRED QUIET)
 
-add_executable(Particle_Advection ParticleAdvection.cxx)
-target_link_libraries(Particle_Advection PRIVATE vtkm_filter)
+add_executable(ParticleAdvection ParticleAdvection.cxx)
+target_link_libraries(ParticleAdvection PRIVATE vtkm_filter)
 
 if(TARGET vtkm::tbb)
-  target_compile_definitions(Particle_Advection PRIVATE BUILDING_TBB_VERSION)
+  target_compile_definitions(ParticleAdvection PRIVATE BUILDING_TBB_VERSION)
 endif()
 
 if(TARGET vtkm::cuda)
