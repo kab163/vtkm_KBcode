@@ -1,0 +1,7 @@
+/home/users/kab163/vtkm_KBcode/MarchingCube/CMakeFiles/install/strip.dir
+/home/users/kab163/vtkm_KBcode/MarchingCube/CMakeFiles/install/local.dir
+/home/users/kab163/vtkm_KBcode/MarchingCube/CMakeFiles/marchingcubes.dir
+/home/users/kab163/vtkm_KBcode/MarchingCube/CMakeFiles/install.dir
+/home/users/kab163/vtkm_KBcode/MarchingCube/CMakeFiles/edit_cache.dir
+/home/users/kab163/vtkm_KBcode/MarchingCube/CMakeFiles/rebuild_cache.dir
+/home/users/kab163/vtkm_KBcode/MarchingCube/CMakeFiles/list_install_components.dir

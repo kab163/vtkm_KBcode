@@ -13,10 +13,29 @@
 #include <vector>
 #include <vtkm/cont/DeviceAdapter.h>
 #include <vtkm/worklet/DispatcherMapField.h>
+#include <vtkm/Math.h>
 
-#define NUM 20
+#define NUM 40
 #define ROUNDS 5
-#define THRESHOLD 200
+#define THRESHOLD 20
+
+/*
+ * Simple function to decide if the code should be run on the GPU or not.
+ * This is a base version for my Oracle. 
+ *
+ * Input: GPU ArrayHandle (to access data seen by GPU) - (plus, potentially 
+ * other arguments for determining if code should be run on GPU or not.)
+ *
+ * Return value is boolean - true if it should run on GPU, false otherwise.
+ */
+
+bool deviceOracle(vtkm::cont::ArrayHandle<vtkm::FloatDefault> gpuInput, size_t rounds) {
+  bool result = false;
+
+  if(gpuInput.GetNumberOfValues() >= (THRESHOLD * rounds)) result = true;
+
+  return result;
+}
 
 /*
  * Creating a vtkm worklet that will take an input value and square it.
@@ -43,7 +62,6 @@ public:
 
 }
 
-
 int main(int argc, char** argv)
 {
   std::vector<vtkm::FloatDefault> numbers; //holds the original input
@@ -56,9 +74,8 @@ int main(int argc, char** argv)
     numbers.push_back(index);
   }
 
-  //ArrayHandles that hold GPU and CPU inputs
-  vtkm::cont::ArrayHandle<vtkm::FloatDefault> gpuInput = vtkm::cont::make_ArrayHandle(numbers);
-  vtkm::cont::ArrayHandle<vtkm::FloatDefault> cpuInput = vtkm::cont::make_ArrayHandle(numbers);
+  //ArrayHandle that hold GPU and CPU inputs
+  vtkm::cont::ArrayHandle<vtkm::FloatDefault> Input = vtkm::cont::make_ArrayHandle(numbers);
   
   //ArrayHandles that hold GPU and CPU outputs
   vtkm::cont::ArrayHandle<vtkm::FloatDefault> cpuOutput;
@@ -71,23 +88,22 @@ int main(int argc, char** argv)
   //setting up a vtkm dispatcher specified by map operations on 'Square's 
   vtkm::worklet::DispatcherMapField<Square> dispatcher;
 
-  //ArrayPortals for CPU and GPU inputs (note this is read/write)
-  auto gpuInPortal = gpuInput.GetPortalControl();
-  auto cpuInPortal = cpuInput.GetPortalControl();
+  //setting up the type of portal we want for the ArrayHandles
+  using PortalType = typename vtkm::cont::ArrayHandle<vtkm::FloatDefault>::PortalControl;
 
   //ArrayPortals for CPU and GPU outputs (note this is read/write)
-  auto gpuPortal = gpuOutput.GetPortalControl();
-  auto cpuPortal = cpuOutput.GetPortalControl();
+  PortalType gpuPortal = gpuOutput.GetPortalControl();
+  PortalType cpuPortal = cpuOutput.GetPortalControl();
 
   //looping over the specified number of rounds...
   for(size_t rounds = 0; rounds < ROUNDS; rounds++) {
 
-    if(rounds % 2 == 0) {
+    if(deviceOracle(Input, rounds)) {
       dispatcher.SetDevice(gpu()); //this specifies what device we want to run on
-      dispatcher.Invoke(gpuInput, gpuOutput); //calls the code to actually run on the device
+      dispatcher.Invoke(Input, gpuOutput); //calls the code to actually run on the device
 
       gpuPortal = gpuOutput.GetPortalControl(); //portal for output, now we can access this
-      gpuInput.ReleaseResources(); //get rid of old input, get ready for modified input
+      Input.ReleaseResources(); //get rid of old input, get ready for modified input
 
       //testing if output is above threshold, if it is, it becomes input for next round
       for(size_t gIter = 0; gIter < gpuPortal.GetNumberOfValues(); gIter++)
@@ -95,34 +111,34 @@ int main(int argc, char** argv)
         if(gpuPortal.Get(gIter) > THRESHOLD) gEditing.push_back(gpuPortal.Get(gIter));
       } 
 
-      gpuInput = vtkm::cont::make_ArrayHandle(gEditing); //setting modified input as our input
+      Input = vtkm::cont::make_ArrayHandle(gEditing); //setting modified input as our input
 
       std::cout << "GPU output for Round # : " << rounds << std::endl;
       for(size_t index = 0; index < gpuPortal.GetNumberOfValues(); index++)
       {
-        std::cout << gpuInPortal.Get(index) << " : " << gpuPortal.Get(index) << std::endl;
+        std::cout << index << " : " << gpuPortal.Get(index) << std::endl;
       }
       gEditing.clear();
     }
     else {
       dispatcher.SetDevice(cpu()); //specifies the device we want to run on
-      dispatcher.Invoke(cpuInput, cpuOutput); //calls the code to actually run on device
+      dispatcher.Invoke(Input, cpuOutput); //calls the code to actually run on device
     
       cpuPortal = cpuOutput.GetPortalControl(); //portal for output, now we can access the results
-      cpuInput.ReleaseResources(); //getting rid of old input so we can make room for the modified
+      Input.ReleaseResources(); //getting rid of old input so we can make room for the modified
 
       //testing if output is below threshold, if it is, it becomes input for next round
       for(size_t iter = 0; iter < cpuPortal.GetNumberOfValues(); iter++)
       {
-        if(cpuPortal.Get(iter) < THRESHOLD) cEditing.push_back(cpuPortal.Get(iter));
+        if(vtkm::Log(cpuPortal.Get(iter)) < THRESHOLD) cEditing.push_back(numbers.at(iter));
       }
 
-      cpuInput = vtkm::cont::make_ArrayHandle(cEditing); //setting modified input as our input
+      Input = vtkm::cont::make_ArrayHandle(cEditing); //setting modified input as our input
 
       std::cout << "CPU output for Round # : " << rounds << std::endl;
       for(size_t index = 0; index < cpuPortal.GetNumberOfValues(); index++)
       {
-        std::cout << cpuInPortal.Get(index) << " : " << cpuPortal.Get(index) << std::endl;
+        std::cout << index << " : " << cpuPortal.Get(index) << std::endl;
       }
       cEditing.clear();
     }
