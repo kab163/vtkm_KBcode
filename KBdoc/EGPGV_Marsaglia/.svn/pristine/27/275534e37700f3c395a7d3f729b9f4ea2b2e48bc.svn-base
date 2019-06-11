@@ -1,0 +1,99 @@
+% ---------------------------------------------------------------------
+% EG author guidelines plus sample file for EG publication using LaTeX2e input
+% D.Fellner, v1.17, Sep 23, 2010
+
+
+\title[Dynamic I/O Budget Reallocation For In Situ Wavelet Compression]%
+      {Dynamic I/O Budget Reallocation For In Situ Wavelet Compression}
+
+
+%-------------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+%Lossy compression has been explored as a means to reduce the 
+%I/O and storage costs of scientific data on supercomputers.
+%
+%Multiple compression techniques are available to effectively compress 
+%a given data set, but they tend to apply resources to every domain 
+%and/or portion of the data equally.
+%
+%In this paper, we consider an alternate approach where salient domains and/or 
+%portions of the data are automatically identified and then allocated extra resources,
+%i.e., storage budget.
+%
+%We formalize two strategies to identify salience among the data and allocate the storage budget accordingly. 
+%
+%These strategies are tested and discussed on a wavelet-based compression scheme.
+%
+%The first strategy is specific to wavelets, the second could be applied to other compression techniques. 
+%
+%Our results suggest that salience-aware compression can improve information per byte for large scale scientific data.
+%
+%\fix{Hank's version:}
+In situ wavelet compression is a potential solution for enabling post hoc visualization on supercomputers with slow I/O systems.
+%
+While this in situ compression is typically accomplished by allocating an equal storage budget to each compute node, we propose an adaptive approach.
+%
+With our approach, we introduce an assessment step prior to compression, where each node characterizes the variation in its portion of the data, and then dynamically adapts storage budgets to the nodes with the most variation.
+%
+%We also consider two strategies for adapting the budget, based on wavelet magnitude and Shannon Entropy.
+%
+We conducted experiments comparing our adaptive approach with the traditional, non-adaptive approach, on two different simulation codes with concurrencies of 512 cores and mesh resolutions of one billion cells.
+%
+Our findings show that our adaptive approach yields three orders of magnitude of improvement for one simulation and is not harmful for the other.
+
+\end{abstract}
+
+
+
+
+
+%-------------------------------------------------------------------------
+\section{Introduction}
+\input{intro2.tex}
+\vspace{-1.3em}
+
+%-------------------------------------------------------------------------
+\section{Related Work}
+\input{relatedwork.tex}
+\vspace{-1.3em}
+
+
+%-------------------------------------------------------------------------
+\section{Reallocation Strategies}
+\input{strategies.tex}
+\vspace{-1.3em}
+
+%-------------------------------------------------------------------------
+\section{Experiment Overview}
+\input{experiment.tex}
+\vspace{-1.3em}
+
+%-------------------------------------------------------------------------
+\section{Results}
+\input{results.tex}
+\vspace{-1.3em}
+
+%-------------------------------------------------------------------------
+\section{Conclusion}
+\input{conclusion.tex}
+\vspace{-1.3em}
+%-------------------------------------------------------------------------
+%\section{Acknowledgements}
+%\input{acks.tex}
+%\vspace{-1.3em}
+%-------------------------------------------------------------------------
+
+%\bibliographystyle{eg-alpha}
+\bibliographystyle{eg-alpha-doi}
+
+\bibliography{biblio}
+
+%-------------------------------------------------------------------------
+\newpage
+
+
+\end{document}

@@ -1,0 +1,26 @@
+[
+  {
+    "action": "add_extracts",
+    "extracts":
+    {
+      "e1":
+      {
+        "type": "wavelet",
+        "params":
+        {
+          "protocol" : "proportional",
+          "variable" : "e",
+          "cratio"   : 32.0,
+          "path"     : "/glade/scratch/shaomeng/Ascent/lulesh/"
+        }
+      }
+    }
+  },
+  {
+    "action": "execute"
+  },
+
+  {
+    "action": "reset"
+  }
+]

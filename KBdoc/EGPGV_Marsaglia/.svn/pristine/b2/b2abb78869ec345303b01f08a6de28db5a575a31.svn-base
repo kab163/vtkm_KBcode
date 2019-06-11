@@ -1,0 +1,49 @@
+This work utilizes two different strategies to dynamically reallocate the I/O budget among the parallel processes. 
+%
+These strategies are compared against the standard compression that equally allocates the I/O budget to all parallel processes. 
+
+
+\subsection{Magnitude}
+The first strategy, involving the calculated wavelet magnitudes, is inherent to wavelet compression. 
+%
+During the wavelet compression process, the data values are prioritized with each pass of the filter along each axis. 
+%
+First, rank will calculate its total local magnitude.
+%
+Second, an MPI$\_$AllReduce summation will calculate the total global magnitude.
+%
+And then lastly, each rank will determine their respective ratio. 
+%
+This ratio is then used to determine that rank's I/O budget. 
+
+\subsection{Entropy}
+The second strategy utilizes Shannon Entropy, also called Information Entropy, a widely used strategy to deterine the importance of data. 
+%
+From a high level, Shannon Entropy calculated the number of bits is required to save the given data. 
+%
+The more bits that are required, then the more information that is present. 
+%
+Entropy is calculated by binning the data into some $n$ bins. 
+%
+Once all the data has been binned, bin $i$ will calculate its respective probability $p_i$.
+%
+Let $b_i$ be the total number of values in bin $i$. 
+%
+Then
+\begin{center}
+ $p_i = \frac{b_i}{\text{total number of values}}$.
+\end{center} 
+%
+From there, entropy
+\begin{center}
+ $E = - \sum_{i=1}^n p_i \log p_i$. 
+\end{center}
+%
+
+Each rank will calculate its local entropy value, an MPI$\_$AllReduce summation is used to calculate the total global entropy, and from there each rank will calculate their respective ratio. 
+%
+Identical to the wavelet strategy, the calculated ratio will determine each ranks I/O budget and will save data accordingly.  
+
+
+\subsection{Standard}
+The two reallocation strategies will be compared against the standard wavelet compression where each rank has a fixed I/O budget. 

@@ -1,0 +1,74 @@
+The goal of this research is to divert I/O resources to where they are needed most. 
+%
+Our technique consists of two phases. 
+%
+In the first phase, we perform a lightweight analysis step to determine the most pertinent data among all the compute nodes. 
+%
+In the second phase, we perform wavelet compression, adapting the I/O budget per node according to results from the first phase.
+
+Further, within the first phase, we explore two different strategies for assessing data content.
+%
+Our first strategy is inherent to wavelet compression --- utilizing the coefficient magnitudes that are calculated during the transform process. 
+%
+Our second strategy uses Shannon entropy to discern the most salient data;
+these results are then used to derive the budgets for each compute node's wavelet compression.
+%
+We also compare these two strategies against the standard strategy, i.e.,
+equally allocating the I/O budget to all compute nodes. 
+%These strategies are compared against the standard model for wavelet compression, which 
+
+\vspace{-1.3em}
+\subsection{Wavelet Magnitude}
+%
+The first strategy, involving the calculated wavelet magnitudes, is innate to wavelet compression. 
+%
+We note that in the setting of multi-domain simulations, 
+compression is applied on individual domains to generate coefficients.
+%
+Magnitude difference across domains no longer necessarily warrant difference in information content; 
+nevertheless, magnitude still remains as a strong indicator of the global importance of each domain.
+%
+During the wavelet compression process, the data values are prioritized with each pass of the filter along each axis. 
+%
+First, rank will calculate its total local magnitude.
+%
+Second, an MPI$\_$AllReduce summation will calculate the total global magnitude.
+%
+And then lastly, each rank will determine their respective ratio. 
+%
+This ratio is then used to determine that rank's I/O budget. 
+
+\vspace{-1.3em}
+\subsection{Entropy}
+The second strategy utilizes Shannon Entropy, also called Information Entropy, a widely used strategy to determine the importance of data. 
+%
+From a high level, Shannon Entropy calculated the number of bits is required to save the given data. 
+%
+The more bits that are required, then the more information that is present. 
+%
+%Entropy is calculated by binning the data into some $n$ bins. 
+%
+%Once all the data has been binned, bin $i$ will calculate its respective probability $p_i$.
+%
+%Let $b_i$ be the total number of values in bin $i$. 
+%
+%Then
+%\begin{center}
+% $p_i = \frac{b_i}{\text{total number of values}}$.
+%\end{center} 
+%
+%From there, entropy
+%\begin{center}
+% $E = - \sum_{i=1}^n p_i \log p_i$. 
+%\end{center}
+%
+
+Each rank will calculate its local entropy value from the input data. 
+%
+Then, an MPI$\_$AllReduce summation is used to calculate the total global entropy, and from there each rank will calculate their respective ratio. 
+%
+Identical to the wavelet strategy, the calculated ratio will determine each ranks I/O budget and will save data accordingly.  
+
+\vspace{-1.3em}
+\subsection{Standard}
+The two reallocation strategies will be compared against the standard wavelet compression where each rank has a fixed I/O budget. 

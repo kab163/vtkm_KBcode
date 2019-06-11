@@ -1,0 +1,43 @@
+Visualization under the old paradigm required data producers to save out every cycle, at which point the data would be visualized post-hoc. 
+%
+But the increasing gap between compute and I/O capabilities has made the old post-hoc paradigm unpalatable. 
+%
+This has lead to new approaches, namely in situ visualization and analysis. 
+%
+The former produces images as the simulation runs, but no data is saved. 
+%
+The latter performs lightweight analysis that should reduce the amount of data being saved, allowing for post-hoc analysis. 
+%
+This paper focuses on the latter technique. 
+%
+And more specifically, this research focuses on in situ compression. 
+
+
+For large-scale simulations, saving every cycle is a non-starter. 
+%
+Instead, simulations will save individual cycles at fixed or variable intervals. 
+%
+And even then, those chosen cycles will utilize some form of compression to further reduce the I/O burden. 
+%
+One such compression technique is wavelet compression. 
+%
+In a typical workflow, wavelet compression concentrates the vast majority of 
+information into a small amount of coefficients, 
+and given an I/O budget, it fills the budget with coefficients with the most 
+information content.
+
+Typically, during a large-scale, parallel simulation, each domain is allocated the same amount of resources, especially when it comes to the desired I/O budget.
+%
+In practice, however, some domains may contain data of little consquence, and thus, their resources may be better utilized elsewhere. 
+%
+This work researches the effectiveness of resource reallocation for compression with two strategies to reallocate the I/O budget of each domain for each cycle as the simulation runs. 
+
+The first reallocation strategy is specific to wavelet compression. 
+%
+Wavelet compression inherently prioritizes data within a domain, we use this information to calculate a domain's data's global importance, and reallocate the I/O allocation accordingly. 
+%
+The second reallocation strategy encorporates Shannon Entropy, a calculation that has become common in information science and determining the information content of data. 
+%
+The Shannon Entropy is calculated for each domain, and then compared globally; a domain's I/O budget is then determined by the global entropy calculation.
+
+This research shows that dynamicallhy reallocating I/O budget can lead to increased storage savings and more accurate output.  

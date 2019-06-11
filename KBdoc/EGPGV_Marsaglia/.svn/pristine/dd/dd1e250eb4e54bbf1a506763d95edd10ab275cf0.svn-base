@@ -1,0 +1,125 @@
+Related work is broken into three sections. 
+%
+The first section reviews work that reallocate resources to achieve better efficiency.
+%
+The second section covers works that use entropy in scientific visualization. 
+%
+The third section reviews the use of wavelet compression in scientific simulation and visualization.
+
+\subsection{Resource Reallocation}
+
+%Understanding how to dynamically adapt resource usage on the fly is an important consideration when trying to find the right allocation strategy.
+%
+Understanding workflow execution and scheduling hardware resources accordingly is an important consideration when trying to find the right resource allocation strategy.
+%
+%Additionally, available resources for workflow tasks may be limited and are oftentimes variable.
+%
+If one task is given insufficient resources, it could become a bottleneck for the entire workflow.
+%
+Thus, adapting resource usage dynamically, and reallocating resources according to runtime needs will speed up the overall workflow\cite{semreport}.
+
+Labasan et al. \cite{Labasan:EGPGV17} study the adaptation of different resource allocations for different visualization routines in a power-constrained environment.
+%
+%Their work revolves around the idea that uniform allocation of a resource across nodes is not optimal in the case where the runtime behaviors are highly variable among the nodes.
+%
+%To alleviate this problem, reallocating resources as necessary becomes a viable alternative that improves the overall performance of the application.
+
+Work by Damaris et al.~\cite{Damaris} created an I/O middleware with in situ capabilities for HPC simulations that adapts to the specific needs of simulaitons by using a dynamic plugin-loading architecture.% that can support some data transformations.
+%adapts to the specific needs of simulations by gathering the capabilities of several visualization tools to offer a unified data management interface.
+%
+ADIOS \cite{adios} also provides a level of adaptability so that the researcher can change how the I/O in the code works, thereby transparently changing how the data is processed.
+%
+
+\subsection{Entropy}
+
+%Scientific Visualization helps scientists analyze and understand data by providing a visual representation of how the data evolves throughout a simulation of some event.
+%
+%Because the visual analysis and the discovery process is often operated by the user through trial and error in an ad hoc manner, some important features of the data may be overlooked or left undiscovered. 
+%
+%Moreover, critical parameters for visualization algorithms (i.e. camera positions and directions, levels of details, isocontours, etc.) often need to be fine-tuned and frequently updated in order to obtain reliable visualization results. 
+%
+%One major cause of the difficulties in visual analysis of large datasets is the lack of quantitative metrics to measure the visualization quality relative to the amount of information contained in the data. 
+%
+%As the amount of data needing to be processed continues to grow, determining what data is critical for understanding the behavior of the simulation becomes a priority for research scientists. 
+%
+%While there are different techniques for determining which part of the data is important, 
+Information theory has been used as a viable way to distinguish between significant and less important parts of the data \cite{entropyWang}. 
+%
+%Information theory is most helpful when researchers do not know what exact questions to ask about their data or want to find more meaningful information from that data. 
+%
+%Exhaustively searching through all the data for meaningful insight is inefficient and oftentimes not plausible. 
+%
+Using information theory concepts can help scientists narrow down parts of the data to only those parts which contain important features \cite{purchase}.
+%
+Entropy is one such information theory technique that helps researchers mathematically identify and extract hidden or difficult to detect features that may be present in their data. 
+%
+According to Shannon \cite{Shannon}, entropy can be calculated for a random variable, x, and is a measure of the average uncertainty in the random variable. 
+%
+%Below is the Shannon Entropy formula \cite{entropyWang} \cite{Chen}:
+%\begin{equation}
+%H\big(X\big) = - \sum_{x\in\chi} p\big(x\big) \log_{2} p\big(x\big)
+%\end{equation}
+%Let $X$ be a discrete random variable with alphabet $\chi$ and probability mass function $p\big(x\big)$ , $x\in\chi$. 
+%
+%
+%More that can describe the function? 
+The higher the entropy, the more information the variable contains.
+%
+The entropy is always nonnegative \cite{CoverBook} and describes the number of bits (units of information) on average required to describe the random variable \cite{LiPaper}. 
+%
+%When all random variables have equal probability $\Big(p\big(x\big) = \frac{1}{n}\Big)$, $H$ is maximized. 
+%
+%Conversely, when the probability of a single variable is one and the rest are zeros, $H$ is minimized. 
+%
+%Thus, the entropy calculation determines a theoretical lower bound on the number of bits required to represent the variables without information loss \cite{LiPaper}. 
+
+Dorier et al. \cite{Dorier} show that not all generated data is relevant to understanding the physical phenomena being simulated.
+%
+To highlight the potentially interesting regions of data that carry important information, they use metrics based on information theory.
+%
+Their proposed method redistributes blocks of data across processes in order to achieve better load balance.
+%
+Additionally, Wang et al. \cite{entropyWang2, entropyWang3} uses various visualization applications to demonstrate how entropy, in particular, can highlight certain areas of data that are particularly important for understanding the problem being visualized.%
+%Similarly, we can also describe the conditional entropy of two variables, $H\big(X|Y\big)$ . 
+%
+%Conditional entropy is the entropy of a random variable conditional on the knowledge of another random variable. 
+%
+%The conditional entropy of different variables in a field relative to other random variables is another useful concept in scientific visualization \cite{CoverBook}. 
+%
+To show this, they partitioned a large data set into blocks and studied the relative entropy of one block of data compared to a different block of data, indicating if one block of data has more important data than another block or not.
+%
+%In the context of a distributed memory system, this technique can be used to determine the entropy of a data partition belonging to one process compared to another data partition. 
+%
+%Analyzing the relative entropy of different data partitions can indicate if one block of data has more important data than another block or not. 
+%
+This strategy is particularly useful when visualization resources are limited and should be allocated more to processes with more important data. 
+
+\subsection{Wavelet Compression}
+%
+Wavelet compression is rooted from image processing where 2D images are compressed at a 
+much better efficiency than the widely used JPEG format~\cite{shapiro1993embedded,said1993image,skodras2001jpeg}.
+%
+In the scientific visualization community, 3D wavelet compression is used to improve
+interactivity and accelerate renderings~\cite{kim1999efficient,ihm1999wavelet,
+guthe2002interactive,treib2012turbulence}.
+
+
+In recent years, with the rise of big data and the growing I/O gap, wavelets are 
+increasingly viewed and applied as a traditional compression operators.
+%
+Such applications include compressing simulation checkpoint files~\cite{sasaki2015exploration},
+climate model output~\cite{woodring:2011,Li:17DRBSD17},
+turbulent flow simulations~\cite{Li:LDAV2015},
+and more generic volumetric scientific data~\cite{villasenor1996seismic,gralka2013application,Li:CLUSTER17}.
+%
+In all these applications, wavelet compression has proven to provide significant data reduction while 
+maintaining satisfactory data fidelity for further analysis.
+
+Finally, what most closely relates to this research is that wavelet compression also fits in the in situ analysis paradigm.
+%
+That is because wavelet compression is demonstrated to be capable of achieving portable performance across 
+modern massively parallel architectures (i.e., many-core CPUs and GPUs)~\cite{Li:EGPGV17}
+and reducing overall I/O time for simulation runs with hundreds to thousands of 
+compute nodes~\cite{Li:ISAV17}.
+
+

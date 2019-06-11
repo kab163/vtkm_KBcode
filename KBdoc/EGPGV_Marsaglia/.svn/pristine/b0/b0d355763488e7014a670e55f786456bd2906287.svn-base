@@ -1,0 +1,52 @@
+This research was implented within the Ascent framework \cite{Larsen} and the experiments were run on NERSC's Cori supercomputer as well as NCAR's Cheyenne supercomputer.
+%
+Ascent provides a lightweight in situ infrastructure that includes a vtk-m wavelet implementation \cite{vtkm}. 
+%
+
+To determine the merit of our reallocation strategies compared to the standard, fixed wavelet compression, our strategies were run in situ on two different simulations present within Ascent and with varying I/O budgets. 
+%  
+\subsection{Experiment Parameters}
+Below are the factors that we varied for each of our experiments. 
+%
+In total this research conducted 18 runs of our allocation strategies. 
+
+\subsubsection{Simulations}
+\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+\item Lulesh \cite{lulesh} is a hydrodynamics simulation that models the Sedov blast problem. 
+%
+This simulation had size $1000^3$ and ran for 10,200 cycles with 512 ranks on 32 nodes. 
+%
+The experiments for Lulesh were performed on Cori.
+\item CloverLeaf3D \cite{clover} is a simulation that solves the compressible Euler equations. 
+%
+This simulation had size $1000^3$ and ran for 500 cycles with 64 ranks on 32 nodes. 
+%
+The experiments for CloverLeaf3D were performed on Cheyenne. 
+\end{itemize}
+
+\subsubsection{Allocation Strategies}
+\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+\item Magnitude 
+\item Entropy
+\item Standard
+\end{itemize}
+
+\subsubsection{I/O Budget}
+\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+\item 32:1
+\item 64:1
+\item 128:1
+\end{itemize}
+
+\subsection{Measurements}
+The Normalized Root Mean Square Error (NRMSE) is calculated for the compressed output compared to the original data. 
+\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+\item Maximum and Average NRMSE
+\end{itemize}
+
+ 
+
+
+
+
+ 

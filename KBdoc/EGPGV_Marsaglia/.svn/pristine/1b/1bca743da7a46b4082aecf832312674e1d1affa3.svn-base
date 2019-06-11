@@ -1,0 +1,68 @@
+Related work is broken into two sections. 
+%
+The first section reviews works substantiating wavelet compression as a valid candidate for in situ compression. 
+%
+The second section covers works that use entropy in scientific visualization. 
+
+\subsection{Wavelets}
+
+\subsection{Entropy}
+
+Scientific Visualization helps scientists analyze and understand data by providing a visual representation of how the data evolves throughout a simulation of some event.
+%
+Because the visual analysis and the discovery process is often operated by the user through trial and error in an ad hoc manner, some important features of the data may be overlooked or left undiscovered. 
+%
+Moreover, critical parameters for visualization algorithms (i.e. camera positions and directions, levels of details, isocontours, etc.) often need to be fine-tuned and frequently updated in order to obtain reliable visualization results. 
+%
+One major cause of the difficulties in visual analysis of large datasets is the lack of quantitative metrics to measure the visualization quality relative to the amount of information contained in the data. 
+%
+As the amount of data needing to be processed continues to grow, determining what data is critical for understanding the behavior of the simulation becomes a priority for research scientists. 
+
+While there are different techniques for determining which part of the data is important, information theory has been used as a viable way to distinguish between significant and less important parts of the data [1]. 
+%
+Information theory is most helpful when researchers do not know what exact questions to ask about their data or want to find more meaningful information from that data. 
+%
+Exhaustively searching through all the data for meaningful insight is inefficient and oftentimes not plausible. 
+%
+Instead, using information theory concepts can help scientists narrow down parts of the data to only those parts which contain important features [6].
+%
+Entropy is one such information theory technique that helps researchers mathematically identify and extract hidden or difficult to detect features that may be present in their data. 
+%
+According to Shannon [8], entropy can be calculated for a random variable, x, in data. 
+%
+Below is the Shannon Entropy formula [1, 7]:
+\begin{equation}
+H\big(X\big) = - \sum_{x\in\chi} p\big(x\big) \log_{2} p\big(x\big)
+\end{equation}
+Let $X$ be a discrete random variable with alphabet $\chi$ and probability mass function $p\big(x\big)$ , $x\in\chi$. 
+%
+The entropy is a measure of the average uncertainty in the random variable. 
+%
+More that can describe the function? 
+%
+The entropy is always nonnegative [3] and describes the number of bits (units of information) on average required to describe the random variable. 
+%
+When all random variables have equal probability $\Big(p\big(x\big) = \frac{1}{n}\Big)$, $H$ is maximized. 
+%
+Conversely, when the probability of a single variable is one and the rest are zeros, $H$ is minimized. 
+%
+Thus, the entropy calculation determines a theoretical lower bound on the number of bits required to represent the variables in X without information loss [2]. 
+
+Additionally, the higher the entropy, the more information the variable contains. 
+%
+Wang et al. [4, 5] uses various visualization applications to demonstrate how entropy can highlight certain areas of data that are particularly important for understanding the problem being visualized. 
+%
+Similarly, we can also describe the conditional entropy of two variables, $H\big(X|Y\big)$ . 
+%
+Conditional entropy is the entropy of a random variable conditional on the knowledge of another random variable. 
+%
+The conditional entropy of different variables in a field relative to other random variables is another useful concept in scientific visualization [3]. 
+%
+On that same note, Wang et al. [4, 5] partitioned a large data set into blocks and studied the relative entropy of one block of data compared to a different block of data. 
+%
+In the context of a distributed memory system, this technique can be used to determine the entropy of a data partition belonging to one process compared to another data partition. 
+%
+Analyzing the relative entropy of different data partitions can indicate if one block of data has more important data than another block or not. 
+%
+This strategy is particularly useful when visualization resources are limited and should be allocated more to processes with more important data. 
+

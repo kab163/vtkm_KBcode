@@ -1,0 +1,45 @@
+#lulesh
+@techreport{lulesh,
+title = {{H}ydrodynamics {C}hallenge {P}roblem, {L}awrence {L}ivermore {N}ational {L}aboratory},
+number = {LLNL-TR-490254},
+location = {Livermore, CA},
+pages = {1-17}
+}
+
+#cloverleaf
+@MISC{clover,
+    author = {G. R. Mudalige and I. Z. Reguly and M. B. Giles and W. Gaudin and J. A. Herdman and A. Mallinson},
+    title = {High-level Abstractions for Performance, Portability and Continuity of Scientific Software on Future Computing Systems- CloverLeaf 3D},
+    year = {2015}
+}
+
+#vtkm
+@ARTICLE{vtkm,
+author={K. {Moreland} and C. {Sewell} and W. {Usher} and L. {Lo} and J. {Meredith} and D. {Pugmire} and J. {Kress} and H. {Schroots} and K. {Ma} and H. {Childs} and M. {Larsen} and C. {Chen} and R. {Maynard} and B. {Geveci}},
+journal={IEEE Computer Graphics and Applications},
+title={VTK-m: Accelerating the Visualization Toolkit for Massively Threaded Architectures},
+year={2016},
+volume={36},
+number={3},
+pages={48-58},
+keywords={data structures;data visualisation;multi-threading;parallel processing;visualization toolkit;massively threaded architectures;high-performance computing scientific visualization;HPC scientific visualization;HPC systems;execution bandwidth over latency hiding;scientific visualization software;VTK-m framework;flexible data representation;computer architecture;Data visualization;Algorithm design and analysis;Software engineering;Message systems;Parallel processing;Computer architecture;Computational modeling;computer graphics;high-performance computing;visualization software;parallel algorithms;algorithmic structures;massively threaded processors;VTK-m framework},
+ISSN={0272-1716},
+month={May},}
+
+
+#ascent
+@inproceedings{Larsen,
+ author = {Larsen, Matthew and Ahrens, James and Ayachit, Utkarsh and Brugger, Eric and Childs, Hank and Geveci, Berk and Harrison, Cyrus},
+ title = {The ALPINE In Situ Infrastructure: Ascending from the Ashes of Strawman},
+ booktitle = {Proceedings of the In Situ Infrastructures on Enabling Extreme-Scale Analysis and Visualization},
+ series = {ISAV'17},
+ year = {2017},
+ isbn = {978-1-4503-5139-3},
+ location = {Denver, CO, USA},
+ pages = {42--46},
+ numpages = {5},
+ acmid = {3144778},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {HPC, In Situ, Scientific Visualization},
+} 

@@ -1,0 +1,38 @@
+Wavelet compression is a class of transform-based techniques with their core operation
+being wavelet transforms.
+%
+Such a transform decomposes data into coefficients in the wavelet domain, 
+representing information in various time and frequency scales.
+%
+%With careful choice of wavelet kernels and transformation methods, 
+%the same number of wavelet coefficients are generated to preserve all the 
+%information content of the input data.
+%
+In the use case of compression, wavelet kernels and transformation methods 
+are chosen such that the transform is 
+1) \textit{nonexpansive}, meaning that the number of output coefficients equals the 
+number of input data points, and 
+2) \textit{invertible}, meaning that input data could be reconstructed in its full fidelity.
+
+
+Compression using wavelets happens when a portion, but not all, of wavelet coefficients are 
+used to reconstruct the original data.
+%
+Errors are introduced with the discarding of coefficients.
+%
+However, a selection of wavelet transforms have an outstanding capability of \textit{information 
+concentration}, meaning that the vast majority of information in the data is disproportionately 
+kept in a small amount of coefficients, namely the ones with the largest magnitudes.
+%
+The Haar and CDF wavelet kernels~\cite{cohen1992biorthogonal}
+exhibit all the properties mentioned above, thus are most often used for compression.
+
+
+%With this study, we look into the information content of wavelet coefficients from 
+%different simulation domains, which are produced by separate wavelet transforms.
+%
+%Magnitude difference across domains no longer warrant difference in information content.
+%
+%Our research then looks into possible means that correlate with importance of domains, 
+%and use those means to direct us to reallocate I/O budget.
+

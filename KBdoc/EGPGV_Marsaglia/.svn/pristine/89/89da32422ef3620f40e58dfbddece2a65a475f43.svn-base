@@ -1,0 +1,10 @@
+This work introduces an approach for automatically adapting
+I/O resources based on data complexity.
+%
+The results show benefit for a simulation where data complexity is imbalanced
+and also for a simulation in early phases of simulation.
+%
+Further, among our two strategies, Shannon entropy better captured information
+content than an inherently wavelet based approach.
+%
+In terms of future work, we would like to integrate this into in situ frameworks, and also evaluate on more simulation codes.

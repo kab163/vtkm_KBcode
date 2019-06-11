@@ -1,0 +1,193 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{\uppercase{GWGS02}}
+
+\bibitem[BLZ{\etalchar{*}}14]{adios}
+\textsc{{Boyuka} D.~A., {Lakshminarasimham} S., {Zou} X., {Gong} Z., {Jenkins}
+  J., {Schendel} E.~R., {Podhorszki} N., {Liu} Q., {Klasky} S., {Samatova}
+  N.~F.}:
+\newblock Transparent in situ data transformations in adios.
+\newblock In \emph{2014 14th IEEE/ACM International Symposium on Cluster, Cloud
+  and Grid Computing} (May 2014), pp.~256--266.
+
+\bibitem[BXH{\etalchar{*}}17]{Li:17DRBSD17}
+\textsc{Baker A., Xu H., Hammerling D., Li S., Clyne J.}:
+\newblock {Toward a Multi-method Approach: Lossy Data Compression for Climate
+  Simulation Data}.
+\newblock In \emph{Proceedings of ISC workshops on Data Reduction for Big
+  Scientific Data (DRBSD-1)} (Frankfurt, Germany, Jun 2017).
+
+\bibitem[CT06]{CoverBook}
+\textsc{Cover T., Thomas J.~A.}:
+\newblock Elements of information theory.
+
+\bibitem[DSG{\etalchar{*}}16]{Dorier}
+\textsc{{Dorier} M., {Sisneros} R., {Gomez} L.~B., {Peterka} T., {Orf} L.,
+  {Rahmani} L., {Antoniu} G., {Bougé} L.}:
+\newblock Adaptive performance-constrained in situ visualization of atmospheric
+  simulations.
+\newblock In \emph{2016 IEEE International Conference on Cluster Computing
+  (CLUSTER)} (Sep. 2016), pp.~269--278.
+
+\bibitem[DSP{\etalchar{*}}13]{Damaris}
+\textsc{Dorier M., Sisneros R., Peterka T., Antoniu G., Semeraro D.}:
+\newblock Damaris/viz: A nonintrusive, adaptable and user-friendly in situ
+  visualization framework.
+\newblock pp.~67--75.
+
+\bibitem[GGRE13]{gralka2013application}
+\textsc{Gralka P., Grottel S., Reina G., Ertl T.}:
+\newblock Application-specific compression of large {MD} data preserving
+  physical characteristics.
+\newblock In \emph{IEEE Symposium on Large-Scale Data Analysis and
+  Visualization (LDAV)} (2013), IEEE, pp.~85--93.
+
+\bibitem[GWGS02]{guthe2002interactive}
+\textsc{Guthe S., Wand M., Gonser J., Stra{\ss}er W.}:
+\newblock Interactive rendering of large volume data sets.
+\newblock In \emph{Proceedings of IEEE Visualization (VIS'02)} (2002), IEEE,
+  pp.~53--60.
+
+\bibitem[IP99]{ihm1999wavelet}
+\textsc{Ihm I., Park S.}:
+\newblock Wavelet-based {3D} compression scheme for interactive visualization
+  of very large volume data.
+\newblock In \emph{Computer Graphics Forum} (1999), vol.~18, Wiley Online
+  Library, pp.~3--15.
+
+\bibitem[KS99]{kim1999efficient}
+\textsc{Kim T.-Y., Shin Y.~G.}:
+\newblock An efficient wavelet-based compression method for volume rendering.
+\newblock In \emph{Proceedings of the Seventh Pacific Conference on Computer
+  Graphics and Applications} (1999), IEEE, pp.~147--156.
+
+\bibitem[LAA{\etalchar{*}}17]{Larsen}
+\textsc{Larsen M., Ahrens J., Ayachit U., Brugger E., Childs H., Geveci B.,
+  Harrison C.}:
+\newblock The alpine in situ infrastructure: Ascending from the ashes of
+  strawman.
+\newblock In \emph{Proceedings of the In Situ Infrastructures on Enabling
+  Extreme-Scale Analysis and Visualization} (New York, NY, USA, 2017), ISAV'17,
+  ACM, pp.~42--46.
+
+\bibitem[LGP{\etalchar{*}}15]{Li:LDAV2015}
+\textsc{Li S., Gruchalla K., Potter K., Clyne J., Childs H.}:
+\newblock {Evaluating the Efficacy of Wavelet Configurations on Turbulent-Flow
+  Data}.
+\newblock In \emph{Proceedings of IEEE Symposium on Large Data Analysis and
+  Visualization} (Chicago, IL, Oct 2015), pp.~81--89.
+
+\bibitem[LLCC17]{Li:ISAV17}
+\textsc{Li S., Larsen M., Clyne J., Childs H.}:
+\newblock Performance impacts of in situ wavelet compression on scientific
+  simulations.
+\newblock In \emph{Proceedings of the In Situ Infrastructures for Enabling
+  Extreme-Scale Analysis and Visualization Workshop} (New York, NY, USA, 2017),
+  ISAV2017, ACM.
+
+\bibitem[LLCR17]{Labasan:EGPGV17}
+\textsc{Labasan S., Larsen M., Childs H., Rountree B.}:
+\newblock {PaViz: A Power-Adaptive Framework for Optimizing Visualization
+  Performance}.
+\newblock In \emph{Proceedings of EuroGraphics Symposium on Parallel Graphics
+  and Visualization (EGPGV)} (Barcelona, Spain, 06 2017), pp.~1--10.
+
+\bibitem[LMC{\etalchar{*}}17]{Li:EGPGV17}
+\textsc{Li S., Marsaglia N., Chen V., Sewell C., Clyne J., Childs H.}:
+\newblock {Achieving Portable Performance For Wavelet Compression Using Data
+  Parallel Primitives}.
+\newblock In \emph{Eurographics Symposium on Parallel Graphics and
+  Visualization} (2017), Telea A., Bennett J., (Eds.), The Eurographics
+  Association.
+
+\bibitem[LMG{\etalchar{*}}18]{LiPaper}
+\textsc{Li S., Marsaglia N., Garth C., Woodring J., Clyne J., Childs H.}:
+\newblock Data reduction techniques for simulation, visualization and data
+  analysis.
+\newblock \emph{Computer Graphics Forum 37}, 6 (2018), 422--447.
+
+\bibitem[LSO{\etalchar{*}}17]{Li:CLUSTER17}
+\textsc{Li S., Sane S., Orf L., Mininni P., Clyne J., Childs H.}:
+\newblock Spatiotemporal wavelet compression for visualization of scientific
+  simulation data.
+\newblock In \emph{2017 IEEE International Conference on Cluster Computing
+  (CLUSTER)} (Sept 2017), pp.~216--227.
+
+\bibitem[lul]{lulesh}
+\emph{{H}ydrodynamics {C}hallenge {P}roblem, {L}awrence {L}ivermore {N}ational
+  {L}aboratory}.
+\newblock Tech. Rep. LLNL-TR-490254.
+
+\bibitem[MRG{\etalchar{*}}15]{clover}
+\textsc{Mudalige G.~R., Reguly I.~Z., Giles M.~B., Gaudin W., Herdman J.~A.,
+  Mallinson A.}:
+\newblock High-level abstractions for performance, portability and continuity
+  of scientific software on future computing systems- cloverleaf 3d, 2015.
+
+\bibitem[MSU{\etalchar{*}}16]{vtkm}
+\textsc{{Moreland} K., {Sewell} C., {Usher} W., {Lo} L., {Meredith} J.,
+  {Pugmire} D., {Kress} J., {Schroots} H., {Ma} K., {Childs} H., {Larsen} M.,
+  {Chen} C., {Maynard} R., {Geveci} B.}:
+\newblock Vtk-m: Accelerating the visualization toolkit for massively threaded
+  architectures.
+\newblock \emph{IEEE Computer Graphics and Applications 36}, 3 (May 2016),
+  48--58.
+
+\bibitem[PAJKW]{purchase}
+\textsc{Purchase H., Andrienko N., Jankun-Kelly T., Ward M.}:
+\newblock Theoretical foundations of information visualization. in information
+  visualization: Human-centered issues and perspectives.
+\newblock \emph{Springer-Verlag}.
+
+\bibitem[sem18]{semreport}
+In situ visualization for computational science.
+\newblock Bennett J., Childs H., Garth C., Hentschel B., (Eds.), vol.~8 of
+  \emph{Report from Dagstuhl Seminar 18271}, Dagsthl Publishing.
+
+\bibitem[Sha01]{Shannon}
+\textsc{Shannon C.~E.}:
+\newblock A mathematical theory of communication.
+\newblock \emph{SIGMOBILE Mob. Comput. Commun. Rev. 5}, 1 (01 2001), 3--55.
+
+\bibitem[SSEM15]{sasaki2015exploration}
+\textsc{Sasaki N., Sato K., Endo T., Matsuoka S.}:
+\newblock Exploration of lossy compression for application-level
+  checkpoint/restart.
+\newblock In \emph{Parallel and Distributed Processing Symposium (IPDPS)}
+  (2015), IEEE, pp.~914--922.
+
+\bibitem[TBR{\etalchar{*}}12]{treib2012turbulence}
+\textsc{Treib M., Burger K., Reichl F., Meneveau C., Szalay A., Westermann R.}:
+\newblock Turbulence visualization at the terascale on desktop pcs.
+\newblock \emph{IEEE Transactions on Visualization and Computer Graphics 18},
+  12 (2012), 2169--2177.
+
+\bibitem[VED96]{villasenor1996seismic}
+\textsc{Villasenor J.~D., Ergas R., Donoho P.}:
+\newblock Seismic data compression using high-dimensional wavelet transforms.
+\newblock In \emph{Proceedings of Data Compression Conference (DCC'96)} (1996),
+  IEEE, pp.~396--405.
+
+\bibitem[WK08]{entropyWang2}
+\textsc{Wang C., K.L. M.}:
+\newblock A statistical approach to volume data quality assessment.
+\newblock \emph{IEEE Trans Vis Comput Graph 14} (2008), 590 -- 602.
+
+\bibitem[WMB{\etalchar{*}}11]{woodring:2011}
+\textsc{Woodring J., Mniszewski S., Brislawn C., DeMarle D., Ahrens J.}:
+\newblock Revisiting wavelet compression for large-scale climate data using
+  {JPEG} 2000 and ensuring data precision.
+\newblock In \emph{IEEE Symposium on Large Data Analysis and Visualization
+  (LDAV)} (Oct 2011), pp.~31--38.
+
+\bibitem[WS11]{entropyWang}
+\textsc{Wang C., Shen H.-W.}:
+\newblock Information theory in scientific visualization.
+\newblock \emph{Entropy 13}, 1 (2011), 254--273.
+
+\bibitem[WYM08]{wang}
+\textsc{{Wang} C., {Yu} H., {Ma} K.}:
+\newblock Importance-driven time-varying data visualization.
+\newblock \emph{IEEE Transactions on Visualization and Computer Graphics 14}, 6
+  (Nov 2008), 1547--1554.
+
+\end{thebibliography}

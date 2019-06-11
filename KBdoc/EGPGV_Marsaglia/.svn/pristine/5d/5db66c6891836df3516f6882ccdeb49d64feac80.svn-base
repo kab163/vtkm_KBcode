@@ -1,0 +1,85 @@
+% ---------------------------------------------------------------------
+% EG author guidelines plus sample file for EG publication using LaTeX2e input
+% D.Fellner, v1.17, Sep 23, 2010
+
+
+\title[Dynamic In Situ I/O Budget Reallocation using Wavelet Compression]%
+      {Dynamic In Situ I/O Budget Reallocation using Wavelet Compression}
+
+
+%-------------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Lossy compression has been explored as a means to reduce the 
+I/O and storage costs of scientific data on supercomputers.
+%
+Multiple compression techniques are available to effectively compress 
+a given data set, but they tend to apply resources to every domain 
+and/or portion of the data equally.
+%
+In this paper, we consider an alternate approach where salient domains and/or 
+portions of the data are automatically identified and then allocated extra resources,
+i.e., storage budget.
+%
+We formalize two strategies to identify salience among the data and allocate the storage budget accordingly. 
+%
+These strategies are tested and discussed on a wavelet-based compression scheme.
+%
+The first strategy is specific to wavelets, the second could be applied to other compression techniques. 
+%
+Our results suggest that salience-aware compression can improve information per byte for large scale scientific data.
+
+\end{abstract}
+
+
+
+
+
+%-------------------------------------------------------------------------
+\section{Introduction}
+\input{intro.tex}
+
+
+%-------------------------------------------------------------------------
+\section{Related Work}
+\input{relatedwork.tex}
+
+%-------------------------------------------------------------------------
+\section{Wavelets}
+\input{wavelets.tex}
+
+%-------------------------------------------------------------------------
+\section{Reallocation Strategies}
+\input{strategies.tex}
+
+%-------------------------------------------------------------------------
+\section{Experiment}
+\input{experiment.tex}
+
+%-------------------------------------------------------------------------
+\section{Results}
+\input{results.tex}
+
+%-------------------------------------------------------------------------
+\section{Conclusion}
+\input{conclusion.tex}
+
+%-------------------------------------------------------------------------
+\section{Future Work}
+\input{fw.tex}
+
+%-------------------------------------------------------------------------
+
+%\bibliographystyle{eg-alpha}
+\bibliographystyle{eg-alpha-doi}
+
+\bibliography{biblio}
+
+%-------------------------------------------------------------------------
+\newpage
+
+
+\end{document}

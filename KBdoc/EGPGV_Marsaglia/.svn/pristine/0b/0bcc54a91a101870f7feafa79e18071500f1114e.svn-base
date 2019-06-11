@@ -1,0 +1,63 @@
+%Visualization under the old paradigm required data producers to save out every cycle, at which point the data would be visualized post-hoc. 
+%
+The increasing gap between compute and I/O capabilities on supercomputers 
+has made it difficult for simulation codes to save their state at 
+sufficient temporal frequency for visualization.
+%
+This gap motivates the use of in situ processing.
+%
+That said, in situ processing can be used to enable multiple usage paradigms.
+%
+In one usage paradigm, in situ techniques are used to generate the desired visualizations, resulting in images.
+%
+This paradigm is effective when a user knows the visualization they want to see prior to the simulation.
+%
+In another usage paradigm, in situ techniques are used to transform and reduce the data.
+%
+This reduced data can be stored to disk (i.e., it can be made small enough to fit within a supercomputer's I/O constraints) and then explored post hoc.
+%
+This paradigm can be effective when a user does not know the visualizations they want to see prior to the simulation.
+%
+That said, the data reduction can compromise accuracy, and so it is critical that the reduction process preserve accuracy as best as possible.
+%
+The work described in this paper focuses on the latter usage paradigm, and specifically on increasing accuracy.
+%
+%And more specifically, this research focuses on in situ compression. 
+
+In situ wavelet compression is an important technique for reducing the size of simulation 
+output~\cite{gralka2013application,sasaki2015exploration,Li:17DRBSD17}.
+%
+%For large-scale simulations, saving every cycle is a non-starter. 
+%
+%Instead, simulations will save individual cycles at fixed or variable intervals. 
+%
+%And even then, those chosen cycles will utilize some form of compression to further reduce the I/O burden. 
+%%
+%One such compression technique is wavelet compression. 
+%
+In a typical workflow, wavelet compression concentrates the vast majority of 
+information into a small amount of coefficients.
+%
+Further, wavelets can operate with a specific
+I/O budget, choosing the coefficients with the most 
+information content.
+
+Typically, during a large-scale, parallel simulation, each domain is allocated the same amount of resources, including the desired I/O budget.
+%
+In practice, however, some domains may contain data of little consequence, and thus, their resources may be better utilized elsewhere. 
+%
+This work researches the effectiveness of resource reallocation for compression, i.e., adapting the I/O budget for each compute node as the simulation saves its state. 
+
+We consider two reallocation strategies.
+%
+The first reallocation strategy is specific to wavelet compression. 
+%
+Wavelet compression inherently prioritizes data within a domain. 
+%
+We use this information to calculate the global importance of a compute node's data, and reallocate its I/O budget accordingly. 
+%
+The second reallocation strategy incorporates Shannon Entropy, a calculation that has become common in information science and determining the information content of data. 
+%
+The Shannon Entropy is calculated for each compute node, and then compared globally; a compute node's I/O budget is then determined by the global entropy calculation.
+
+In terms of findings, this research shows that dynamically reallocating the I/O budget can lead to increased storage savings and more accurate output in some cases.  

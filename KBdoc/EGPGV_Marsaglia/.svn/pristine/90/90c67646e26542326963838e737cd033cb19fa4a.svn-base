@@ -1,0 +1,607 @@
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+// Copyright (c) 2015-2018, Lawrence Livermore National Security, LLC.
+// 
+// Produced at the Lawrence Livermore National Laboratory
+// 
+// LLNL-CODE-716457
+// 
+// All rights reserved.
+// 
+// This file is part of Ascent. 
+// 
+// For details, see: http://ascent.readthedocs.io/.
+// 
+// Please also read ascent/LICENSE
+// 
+// Redistribution and use in source and binary forms, with or without 
+// modification, are permitted provided that the following conditions are met:
+// 
+// * Redistributions of source code must retain the above copyright notice, 
+//   this list of conditions and the disclaimer below.
+// 
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the disclaimer (as noted below) in the
+//   documentation and/or other materials provided with the distribution.
+// 
+// * Neither the name of the LLNS/LLNL nor the names of its contributors may
+//   be used to endorse or promote products derived from this software without
+//   specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY,
+// LLC, THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+// DAMAGES  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+// IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+// POSSIBILITY OF SUCH DAMAGE.
+// 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+/******************************************************
+TODO:
+
+ */
+
+
+//-----------------------------------------------------------------------------
+///
+/// file: ascent_runtime_wavelet_filters.cpp
+///
+//-----------------------------------------------------------------------------
+
+#include "ascent_runtime_wavelet_filters.hpp"
+
+//-----------------------------------------------------------------------------
+// thirdparty includes
+//-----------------------------------------------------------------------------
+
+// conduit includes
+#include <conduit.hpp>
+#include "conduit_blueprint.hpp"
+
+//-----------------------------------------------------------------------------
+// ascent includes
+//-----------------------------------------------------------------------------
+#include <ascent_logging.hpp>
+#include <ascent_file_system.hpp>
+
+#include <flow_graph.hpp>
+#include <flow_workspace.hpp>
+
+// wavelet includes
+#include <vtkm/worklet/WaveletCompressor.h>
+
+// mpi related includes
+#ifdef ASCENT_MPI_ENABLED
+#include <mpi.h>
+#else
+//#include <mpidummy.h>
+#define _NOMPI
+#endif
+
+
+#include <set>
+#include <cstring>
+#include <limits>
+#include <cmath>
+#include <iostream>
+#include <cstdlib>
+#include <cstdio>
+#include <cassert>
+#include <sys/time.h>
+
+using namespace std;
+using namespace conduit;
+using namespace flow;
+
+struct coordInfo
+{
+    coordInfo(int r, int n, double r0, double r1) : num(n), rank(r) {range[0]=r0; range[1]=r1;}
+    coordInfo() {num=0; rank=-1; range[0]=range[1]=0;}
+    coordInfo(const coordInfo &c) {num=c.num; rank=c.rank; range[0]=c.range[0]; range[1]=c.range[1];}
+    
+    int num, rank;
+    double range[2];
+};
+
+inline bool operator<(const coordInfo &c1, const coordInfo &c2)
+{
+    return c1.range[0] < c2.range[0];
+}
+
+inline ostream& operator<<(ostream &os, const coordInfo &ci)
+{
+    os<<"(r= "<<ci.rank<<" : n= "<<ci.num<<" ["<<ci.range[0]<<","<<ci.range[1]<<"])";
+    return os;
+}
+
+template <class T>
+inline std::ostream& operator<<(ostream& os, const vector<T>& v)
+{
+    os<<"[";
+    auto it = v.begin();
+    for ( ; it != v.end(); ++it)
+        os<<" "<< *it;
+    os<<"]";
+    return os;
+}
+
+template <class T>
+inline ostream& operator<<(ostream& os, const set<T>& s) 
+{
+    os<<"{";
+    auto it = s.begin();
+    for ( ; it != s.end(); ++it)
+        os<<" "<< *it;
+    os<<"}";
+    return os;
+}
+
+//-----------------------------------------------------------------------------
+// -- begin ascent:: --
+//-----------------------------------------------------------------------------
+namespace ascent
+{
+
+//-----------------------------------------------------------------------------
+// -- begin ascent::runtime --
+//-----------------------------------------------------------------------------
+namespace runtime
+{
+
+//-----------------------------------------------------------------------------
+// -- begin ascent::runtime::filters --
+//-----------------------------------------------------------------------------
+namespace filters
+{
+
+//-----------------------------------------------------------------------------
+WAVELET::WAVELET()
+    :Filter()
+{
+    mpi_comm = 0;
+    rank = 0;
+    numRanks = 1;
+    meshName = "mesh";
+    globalDims.resize(3);
+    localDims.resize(3);
+    offset.resize(3);
+    for (int i = 0; i < 3; i++)
+        globalDims[i] = localDims[i] = offset[i] = 0;
+    
+#ifdef ASCENT_MPI_ENABLED
+    mpi_comm = MPI_Comm_f2c(Workspace::default_mpi_comm());
+    MPI_Comm_rank(mpi_comm, &rank);
+    MPI_Comm_size(mpi_comm, &numRanks);
+#endif
+}
+
+//-----------------------------------------------------------------------------
+WAVELET::~WAVELET()
+{
+// empty
+}
+
+//-----------------------------------------------------------------------------
+void 
+WAVELET::declare_interface(Node &i)
+{
+    i["type_name"]   = "wavelet";
+    i["port_names"].append() = "in";
+    i["output_port"] = "false";
+}
+
+//-----------------------------------------------------------------------------
+bool
+WAVELET::verify_params(const conduit::Node &params,
+                     conduit::Node &info)
+{    
+    bool res = true;
+
+    return res;
+}
+
+//-----------------------------------------------------------------------------
+
+
+
+/*
+   Calculate entropy using Sam's implementation
+   Note that the input buffer (inbuf) is altered to be the abs() of every value
+ */
+double calculate_entropy( double* inbuf,   size_t nfloats,     size_t nbins ) 
+{
+    struct timeval start, end;
+    gettimeofday( &start, NULL );
+
+    /* find out the min and max values of the input;
+       make all values non-negative at the same time.  */
+    inbuf[0]  = std::abs(inbuf[0]);
+    double min = inbuf[0];
+    double max = inbuf[0];
+    for( size_t i = 1; i < nfloats; i++ )
+    {
+        inbuf[i] = std::abs(inbuf[i]); 
+        min      = min < inbuf[i] ? min : inbuf[i];
+        max      = max > inbuf[i] ? max : inbuf[i];
+    }
+    size_t* bincounts = new size_t[nbins+1];
+    for( long i = 0; i < nbins+1; i++ )
+        bincounts[i] = 0;
+
+    double stepSizeOver = nbins / (max - min);
+    for( long i = 0; i < nfloats; i++ )
+    {
+        double idx = (inbuf[i] - min) * stepSizeOver;
+        bincounts[ (long)idx ]++;
+    }
+    bincounts[nbins]++;     // add the last value count
+
+    gettimeofday( &end, NULL );
+    double t = (double)( (end.tv_sec * 1000000 + end.tv_usec) -
+               (start.tv_sec * 1000000 + start.tv_usec) )/1000000.0;
+
+    /* calculate entropy based on the histogram */
+    gettimeofday( &start, NULL );
+    double entropy = 0.0;
+    for( long i = 0; i < nbins; i++ )
+    {
+        if( bincounts[i] != 0 )
+        {
+            double prob = (double)bincounts[i] / (double)nfloats;
+            entropy += prob * std::log( prob );
+        }
+    }
+
+    gettimeofday( &end, NULL );
+    t = (double)( (end.tv_sec * 1000000 + end.tv_usec) -
+        (start.tv_sec * 1000000 + start.tv_usec) )/1000000.0;
+
+    delete[] bincounts;
+    if(entropy == 0)
+      return 0;
+    return -entropy;
+}
+
+//-----------------------------------------------------------------------------
+void 
+WAVELET::execute()
+{
+    ASCENT_INFO("execute");
+
+    if(!input("in").check_type<Node>())
+    {
+        // error
+        ASCENT_ERROR("wavelet filter requires a conduit::Node input");
+    }
+
+vtkm::cont::RuntimeDeviceTracker global_tracker;
+global_tracker = vtkm::cont::GetGlobalRuntimeDeviceTracker();
+global_tracker.ForceDevice(vtkm::cont::DeviceAdapterTagOpenMP());
+
+    std::string protocol     = params()["protocol"].as_string();
+    std::string target_field = params()["variable"].as_string();
+    double std_cratio        = params()["cratio"].as_float64();
+    std::string output_path  = params()["path"].as_string();
+    double pro_cratio = std_cratio;
+    double ent_cratio = std_cratio;
+    int total_dims = 0;
+    //Fetch input data/node
+    const Node *blueprint_data = input<Node>(0);
+    int cycle = 0;
+    double *output_proportional = NULL;
+    double *output_entropy = NULL;
+    double *output_standard = NULL;
+    double *input_data  = NULL;
+    double *standard_data = NULL;
+    NodeConstIterator md_itr = blueprint_data->children();
+    while(md_itr.has_next())
+    {
+      const Node md_child = md_itr.next();
+      if(md_child.has_child("state"))
+      {
+        const Node &state = md_child["state"];
+        cycle = state["cycle"].as_int();
+        if (cycle < 10000 || cycle < 100){
+          cout << cycle << endl;
+          return;
+        }
+      }
+      if (md_child.has_child("fields"))
+      {
+        const Node &dims = md_child["topologies/mesh/elements/dims"];
+        int x_dim = dims["i"].as_int();
+        int y_dim = dims["j"].as_int();
+        int z_dim = dims["k"].as_int();
+        const Node &fields = md_child["fields"];
+        NodeConstIterator fields_itr = fields.children();
+        while(fields_itr.has_next())
+        {
+          const Node& field = fields_itr.next();
+          std::string field_name = fields_itr.name();
+          if(field_name == target_field)
+          {
+            const Node& values = field["values"];
+            if(values.number_of_children() == 0)
+            {
+              if(field["association"].as_string() == "vertex")
+              {
+                const double *vals = values.as_double_ptr();
+                total_dims = (x_dim+1)*(y_dim+1)*(z_dim+1);
+                input_data = (double *)malloc(sizeof(double)*total_dims);
+
+                output_standard     = (double *)malloc(sizeof(double)*total_dims);
+                output_proportional = (double *)malloc(sizeof(double)*total_dims);
+                output_entropy      = (double *)malloc(sizeof(double)*total_dims);
+                std::memcpy(input_data, vals, sizeof(double)*total_dims); 
+
+                DoTheDamnThing(input_data, output_standard, x_dim+1, y_dim+1, z_dim+1, "standard", std_cratio);
+                DoTheDamnThing(input_data, output_proportional, x_dim+1, y_dim+1, z_dim+1, "proportional", pro_cratio);
+                DoTheDamnThing(input_data, output_entropy, x_dim+1, y_dim+1, z_dim+1, "entropy", ent_cratio);
+              }
+              else
+              {
+                const double *vals = values.as_double_ptr();
+                total_dims = x_dim*y_dim*z_dim;
+                input_data = (double *)malloc(sizeof(double)*total_dims);
+
+                output_standard     = (double *)malloc(sizeof(double)*total_dims);
+                output_proportional = (double *)malloc(sizeof(double)*total_dims);
+                output_entropy      = (double *)malloc(sizeof(double)*total_dims);
+                std::memcpy(input_data, vals, sizeof(double)*total_dims); 
+
+                DoTheDamnThing(input_data, output_standard, x_dim, y_dim, z_dim, "standard", std_cratio);
+                DoTheDamnThing(input_data, output_proportional, x_dim, y_dim, z_dim, "proportional", pro_cratio);
+                DoTheDamnThing(input_data, output_entropy, x_dim, y_dim, z_dim, "entropy", ent_cratio);
+              }
+            }
+          }
+        }
+      }
+    }
+#ifdef ASCENT_MPI_ENABLED
+  int entropy_array[numRanks];
+  int proportional_array[numRanks];
+  int global_entropy_array[numRanks];
+  int global_proportional_array[numRanks];
+  for(int i = 0; i < numRanks; i++)
+  {
+    entropy_array[i]      = 0;
+    proportional_array[i] = 0;
+    global_entropy_array[i]      = 0;
+    global_proportional_array[i] = 0;
+  }
+  entropy_array[rank]      = (int)ent_cratio;
+  proportional_array[rank] = (int)pro_cratio;
+  
+  MPI_Allreduce(&entropy_array, &global_entropy_array, numRanks, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&proportional_array, &global_proportional_array, numRanks, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
+  if(rank == 0)
+  {
+    cout << "cycle " << cycle << endl;
+    cerr << "cycle " << cycle << endl;
+    cout << "proportional: ";
+    for (int i = 0; i < numRanks; i++)
+      cout << global_proportional_array[i] << " "; 
+    cout << endl;
+    cout << "entropy: ";
+    for (int i = 0; i < numRanks; i++)
+      cout << global_entropy_array[i] << " "; 
+    cout << endl;
+  }
+#endif
+
+  //if((cycle <10 || cycle > 500) && (pro_cratio != 0 || ent_cratio != 0))
+  if(pro_cratio == 0 || ent_cratio == 0 || pro_cratio != total_dims || ent_cratio != total_dims)
+  {
+   //Write out the data. Each rank individually.  
+    std::stringstream path_proportional;
+    path_proportional << output_path << "proportional.rank_" << rank << ".cycle_" << cycle << ".ratio_" << (int)pro_cratio;
+
+    std::stringstream path_entropy;
+    path_entropy << output_path << "entropy.rank_" << rank << ".cycle_" << cycle << ".ratio_" << (int)ent_cratio;
+
+    std::stringstream path_original;
+    path_original << output_path << "original.rank_" << rank << ".cycle_" << cycle;
+
+    std::stringstream path_standard;
+    path_standard << output_path << "standard.rank_" << rank << ".cycle_" << cycle << ".ratio_" << (int)std_cratio;
+
+    FILE *output_pro;
+    output_pro = fopen(path_proportional.str().c_str(), "wb");
+    fwrite(output_proportional, sizeof(double), total_dims, output_pro);
+    fclose(output_pro);
+    free(output_proportional);
+
+    FILE *output_ori;
+    output_ori = fopen(path_original.str().c_str(), "wb");
+    fwrite(input_data, sizeof(double), total_dims, output_ori);
+    fclose(output_ori);
+    free(input_data);   
+ 
+    FILE *output_std;
+    output_std = fopen(path_standard.str().c_str(), "wb");
+    fwrite(output_standard, sizeof(double), total_dims, output_std);
+    fclose(output_std);
+    free(output_standard);
+
+    FILE *output_ent;
+    output_ent = fopen(path_entropy.str().c_str(), "wb");
+    fwrite(output_entropy, sizeof(double), total_dims, output_ent);
+    fclose(output_ent);
+    free(output_entropy);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void 
+WAVELET::DoTheDamnThing(double *input_data, double *output_data, int x, int y, int z, std::string protocol, double &compression_ratio)
+{
+/*
+#ifdef ASCENT_MPI_ENABLED
+  if(rank == 0) 
+  {
+    cerr << "INPUT: " << endl;
+    for(int i = 0; i < x*y*z; i++)
+    {
+      cerr << input_data[i] << " ";
+    }
+    cerr << endl;
+  }
+#endif
+*/
+    //WAVELET COMPRESSION
+    //SAM:NOW TO COMPRESS VALUES
+    //You can write your code using the standard i/o with equal numcoeff to be saved. 
+    vtkm::Id inX    = x;
+    vtkm::Id inY    = y;
+    vtkm::Id inZ    = z;
+    vtkm::Id inLen  = inX * inY * inZ;
+    // Sam: because input_data is of "double" type, I specify "vtkm::Float64" here.
+    //      If "float" type is desired, then replace "vtkm::Float64" with "vtkm::Float32."
+    vtkm::cont::ArrayHandle<vtkm::Float64> input_array_handle = 
+        vtkm::cont::make_ArrayHandle(input_data, inLen);
+    vtkm::cont::ArrayHandle<vtkm::Float64> output_array_handle;
+    // Sam: create a wavelet compressor
+    vtkm::worklet::wavelets::WaveletName wname = vtkm::worklet::wavelets::BIOR4_4;
+    vtkm::worklet::WaveletCompressor compressor(wname);
+    // Sam: determine how many levels transform to do
+    vtkm::Id XMaxLevel = compressor.GetWaveletMaxLevel(inX);
+    vtkm::Id YMaxLevel = compressor.GetWaveletMaxLevel(inY);
+    vtkm::Id ZMaxLevel = compressor.GetWaveletMaxLevel(inZ);
+    vtkm::Id nLevels = vtkm::Min(vtkm::Min(XMaxLevel, YMaxLevel), ZMaxLevel);
+    // Sam: decompose the input array into wavelet coefficients
+    //compressor.WaveDecompose3D( input_array_handle, nLevels, inX, inY, inZ, 
+    //                            output_array_handle, false, VTKM_DEFAULT_DEVICE_ADAPTER_TAG() );
+    compressor.WaveDecompose3D( input_array_handle, nLevels, inX, inY, inZ, 
+                                output_array_handle, false );
+
+    // Sam: copy wavelet coefficients from "output_array_handle" to "output_data"
+    /* using PortalConstType = typename vtkm::cont::ArrayHandle<vtkm::Float64>::PortalConstControl;
+    PortalConstType output_portal = output_array_handle.GetPortalConstControl();
+    for( vtkm::Id i = 0; i < output_portal.GetNumberOfValues(); i++ )
+      output_data[i] = output_portal.Get(i);
+    // Sam: now optionally release the memory used by "output_array_handle"
+    output_array_handle.ReleaseResources(); */
+/*    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+    int world_size;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+*/
+    vtkm::Float64 cratio = (vtkm::Float64) compression_ratio;
+#ifdef ASCENT_MPI_ENABLED
+    if(protocol == "proportional")
+    {
+      vtkm::Float64 local_mag = 0;
+      vtkm::Id output_len = output_array_handle.GetNumberOfValues();
+      using CoeffArrayBasic = vtkm::cont::ArrayHandle<vtkm::Float64>;
+      CoeffArrayBasic magnitude_array;
+      //vtkm::cont::ArrayCopy(output_array_handle, magnitude_array, VTKM_DEFAULT_DEVICE_ADAPTER_TAG());
+      vtkm::cont::ArrayCopy(output_array_handle, magnitude_array );
+      for(vtkm::Id i = 0; i < output_len; i++)
+          local_mag += fabs(magnitude_array.GetPortalControl().Get(i));
+      vtkm::Float64 global_mag = 0;
+      MPI_Allreduce(&local_mag, &global_mag, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      vtkm::Id n                  = static_cast<vtkm::Id>(static_cast<vtkm::Float64>(output_len) / cratio);    
+      vtkm::Float64 total_storage = n*(vtkm::Float64)numRanks;
+      vtkm::Float64 ratio         = local_mag/global_mag;
+//cout << "PROPORTIONAL: " << " rank " << rank << " RATIO is " << ratio << endl;      
+      
+      vtkm::Float64 tmp_storage = ratio*total_storage;
+//cout << "PROPORTIONAL: " << " rank " << rank << " old cratio is " << cratio << endl;      
+//cout << "PROPORTIONAL: " << " rank " << rank << " tmp storage is " << tmp_storage << endl;      
+      if(tmp_storage >= output_len)
+        cratio = 0;
+      else if (tmp_storage == 0)
+        cratio = output_len;
+      else
+        cratio = output_len/tmp_storage;
+//cout << "PROPORTIONAL: " << " rank " << rank << " new cratio is " << cratio << endl;      
+
+      compression_ratio = (double) cratio;
+    }
+    else if (protocol == "entropy")
+    {
+      double entropy = calculate_entropy(input_data,   x*y*z, 100);
+//      cout << "ENTROPY: rank " << rank  << " has entropy: " << entropy << endl;
+      vtkm::Float64 global_entropy = 0;
+      MPI_Allreduce(&entropy, &global_entropy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      vtkm::Id output_len = output_array_handle.GetNumberOfValues();
+      
+      vtkm::Id n                  = static_cast<vtkm::Id>(static_cast<vtkm::Float64>(output_len) / cratio);    
+      vtkm::Float64 total_storage = n*(vtkm::Float64)numRanks;
+//      cout << "ENTROPY: global  entropy: " << global_entropy << endl;
+      vtkm::Float64 ratio         = entropy/global_entropy;
+//cout << "ENTROPY: " << " rank " << rank << " old cratio is " << cratio << endl;      
+//cout << "ENTROPY: " << " rank " << rank << " ratio is " << ratio << endl;      
+      vtkm::Float64 tmp_storage = ratio*total_storage;
+//cout << "ENTROPY: " << " rank " << rank << " tmp storage is " << tmp_storage << endl;      
+      if(tmp_storage >= output_len)
+        cratio = 0;
+      else if (tmp_storage == 0)
+        cratio = output_len;
+      else
+        cratio = output_len/tmp_storage;
+//cout << "ENTROPY: " << " rank " << rank << " new cratio is " << cratio << endl;      
+
+      compression_ratio = (double) cratio;
+    }
+#endif
+    // Sam: squash coefficients based on cratio
+    if(cratio != 0.0)
+      compressor.SquashCoefficients( output_array_handle, cratio );
+    vtkm::cont::ArrayHandle<vtkm::Float64> reconstruct_array_handle;
+    compressor.WaveReconstruct3D( output_array_handle, nLevels, inX, inY, inZ,
+                                  reconstruct_array_handle, false  );
+    // Sam: copy reconstructed values from "reconstruct_array_handle" to "output_data"
+    using PortalConstType = typename vtkm::cont::ArrayHandle<vtkm::Float64>::PortalConstControl;
+    PortalConstType reconstruct_portal = reconstruct_array_handle.GetPortalConstControl();
+    for( vtkm::Id i = 0; i < reconstruct_portal.GetNumberOfValues(); i++ )
+      output_data[i] = reconstruct_portal.Get(i);
+    // Sam: now optionally release the memory used by 
+    //      "reconstruct_array_handle" and "output_array_handle"
+    reconstruct_array_handle.ReleaseResources();
+    output_array_handle.ReleaseResources();
+
+/*#ifdef ASCENT_MPI_ENABLED
+  if(rank == 0) 
+  {
+    cerr << "OUTPUT: " << endl;
+    for(int i = 0; i < x*y*z; i++)
+    {
+      cerr << output_data[i] << " ";
+    }
+    cerr << endl;
+  }
+#endif
+*/
+}
+
+//-----------------------------------------------------------------------------
+};
+//-----------------------------------------------------------------------------
+// -- end ascent::runtime::filters --
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+};
+//-----------------------------------------------------------------------------
+// -- end ascent::runtime --
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+};
+//-----------------------------------------------------------------------------
+// -- end ascent:: --
+//-----------------------------------------------------------------------------
+
+
+

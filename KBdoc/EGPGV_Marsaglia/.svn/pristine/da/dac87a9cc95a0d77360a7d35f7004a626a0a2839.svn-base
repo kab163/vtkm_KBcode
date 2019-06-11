@@ -1,0 +1,4 @@
+
+The chosen simulations take time to advance to an interesting state, so for the majority of the timesteps only rank 0 had pertinent data. 
+%
+Thus, the reallocation strategies were able to devote their entire I/O budget to saving rank 0's data, whereas the standard compression would only save a fixed portion of rank 0's data. 
