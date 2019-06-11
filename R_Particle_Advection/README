@@ -1,0 +1,5 @@
+
+cmake -DCMAKE_BUILD_TYPE=Release -DVTKm_DIR=/home/users/roba/ORNL/vtkmMaster_19/vtkm-build/lib/cmake/vtkm-1.3 -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_C_COMPILER=/usr/bin/gcc .
+
+
+#run ./Testing
