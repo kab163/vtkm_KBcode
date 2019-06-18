@@ -1,0 +1,10 @@
+%(entitle a main section called 'Study Overview' or 'Experiments')
+To study the Particle Advection code, we use a variety of scientific data sets for our experiments.
+% (entitle a subsection called fusion)
+First, we have a data set from the NIMROD simulation code (find cite). 
+%
+This simulation shows the magnetically confined fusion in a tokamak device.
+%
+With the nature of the simulation, the data set has a unique property that the integral curves traverse the vector field domain repeatedly, giving a swirl-like appearance.
+% (entitle another subsection called 'Thermal Hydraulics')
+

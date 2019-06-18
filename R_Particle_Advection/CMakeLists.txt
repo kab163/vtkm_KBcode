@@ -18,7 +18,7 @@ endif ()
 
 
 
-add_executable(particles particleAdvect.cxx)
+add_executable(particles testInteg.cxx)
 
 
 
@@ -27,5 +27,5 @@ target_link_libraries(particles PRIVATE vtkm_cont vtkm_filter ${VTKm_LIBRARIES})
 target_compile_options(particles PRIVATE ${VTKm_COMPILE_OPTIONS})
 
 if(TARGET vtkm::cuda)
-	set_source_files_properties(particleAdvect.cxx PROPERTIES LANGUAGE "CUDA")
+	set_source_files_properties(testInteg.cxx PROPERTIES LANGUAGE "CUDA")
 endif()
