@@ -14,9 +14,9 @@ Determining the optimal architecture to run these workloads on is a critical con
 %
 In this study, we investigate the important tradeoffs that must be factored in when deciding how to best schedule the Particle Advection workloads on appropriate resources. 
 %
-Given this insight, our main contribution is a new algorithm which adapts execution using the GPU to run relevant parts of the problem and then switch the targeted device according to how the workload evolves.
+Given this insight, our main contribution is a new algorithm which adapts execution: using the GPU to run relevant parts of the problem and then switching the targeted device according to how the workload evolves.
 %
-This algorithm is motivated by the observation that CPUs are sometimes able to better perform part of the overall computation since (1) this practice avoid latency times to the GPU and (2) CPUs operate at a faster rate when the workload can't take advantage of the threads on a GPU.
+This algorithm is motivated by the observation that CPUs are sometimes able to better perform part of the overall computation since (1) this practice avoids latency times to the GPU and (2) CPUs operate at a faster rate when the workload can't take advantage of the threads on a GPU.
 %
 We evaluate our algorithm by running workloads that vary over data set, number of particles, number of steps taken, and number of GPU nodes.
 %
@@ -31,15 +31,37 @@ The results of this study will help inform the Scientific Visualiaiton community
 \section{Intro}
 Particles. They Advect.
 %
+(1) Intro for particle advection. What it does, why it's useful. Streamline vs. FTLE?
+%
+(2) Intro for vtk-m. Talk about portable performance and hardware agnostic. Should mention varying architectures on
+supercomputers.
+%
+(3) What we hope to gain from this study. What the focus of the study is. More general description of goal of paper. 
+Mention research question.
+%
+(4) Other important contribution of the paper. Why should we care? What this study means to overall community.
+%
 %%%%%%%%%%%%RELATED WORK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Related Work}
 We read lots of related work that built the basis for our study.
 %
-%%%%%%%%%%%%%EXPERIMENTS%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Mention David Camp (Pugmire, Childs) papers.
+%
+Other presentations on particle advection.
+%
+Could talk about the effects of hardware architecture on PA performance.
+%
+Should include something on CPU vs GPU performance and when one device is better than the other.
+%
+Perhaps go into more details on problems that are better for GPU hardware vs problems that are better for CPU hardware.
+%
+%%%%%%%%%%%%%STUDY OVERVIEW%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experiments}
+\section{Study Overview}
 To study the effect of adaptively selecting the target device during the Particle Advection execution, we conducted various experiments over a range of carefully tuned parameters.
+%
+Should include a Particle Advection Overview + OUR algorithm overview here. Maybe new section?
 %
 Our experiments varied over 4 main factors:
 %
@@ -61,6 +83,8 @@ The experiments were run on a big supercomputer.
 %
 The experiments were within a super cool framework.
 %
+Runtime environment and measurements taken...
+%
 %%%%%%%%%%%%%%%RESULTS%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
@@ -69,6 +93,8 @@ We had a bunch of cool results.
  Perhaps eventually put a diagram here.
 \end{center}
 We can make lots of analysis.
+%
+Comparison of results to others? 
 %
 %%%%%%%%%%%%%CONCLUSION%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,6 +106,8 @@ We have shown that by analyzing the current workload and selecting an appropriat
 Our findings suggest that adaptively selecting an appropriate device can also lead to better energy efficiency, in addition to enhanced performance. 
 %
 We hope to get this paper published and solve world hunger while we're at it.
+%
+Should we do a summary of findings?
 %
 %%%%%%%%%%%FUTURE WORK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,5 +122,7 @@ They're superb.
 We have lots of people to acknowledge. 
 %
 Whoop whoop.
+%
+Eventually we will have a references section...
 %
 \end{document}
