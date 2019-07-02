@@ -1,0 +1,21 @@
+cmake \
+-DCMAKE_BUILD_TYPE=Release \
+-DVTKm_ENABLE_RENDERING=ON \
+-DVTKm_ENABLE_OPENMP=ON \
+-DVTKm_BUILD_EXAMPLES=OFF \
+-DBUILD_TESTING=OFF \
+-DVTKm_ENABLE_CUDA=OFF \
+-DVTKm_Vectorization=native \
+-DVTKm_ENABLE_TESTING=OFF \
+-DVTKm_USE_DOUBLE_PRECISION=ON \
+-DVTKm_USE_64BIT_IDS=OFF \
+-DOpenMP_C_FLAGS=-I/usr/local/Cellar/libomp/8.0.0/include -L/usr/local/Cellar/libomp/8.0.0/lib \
+-DCMAKE_CXX_COMPILER=/usr/local/bin/g++-8 \
+-DCMAKE_C_COMPILER=/usr/local/bin/gcc-8 \
+-DVTKm_DIR=/Users/1a8/Documents/vtkm_build/lib/cmake/vtkm-1.0 \
+-DCMAKE_BUILD_TYPE=Debug \
+-DOpenMP_C_LIB_NAMES=omp \
+-DOpenMP_CXX_FLAGS=-I/usr/local/Cellar/libomp/8.0.0/include -L/usr/local/Cellar/libomp/8.0.0/lib \
+-DOpenMP_CXX_LIB_NAMES=omp \
+-DOpenMP_omp_LIBRARY=/usr/local/Cellar/libomp/8.0.0/lib/libomp.dylib \
+.

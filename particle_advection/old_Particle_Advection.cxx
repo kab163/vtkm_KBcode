@@ -1,13 +1,3 @@
-//============================================================================
-//  Copyright (c) Kitware, Inc.
-//  All rights reserved.
-//  See LICENSE.txt for details.
-//
-//  This software is distributed WITHOUT ANY WARRANTY; without even
-//  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-//  PURPOSE.  See the above copyright notice for more information.
-//============================================================================
-
 #include <vtkm/cont/DataSet.h>
 #include <vtkm/cont/Initialize.h>
 #include <vtkm/cont/Timer.h>
@@ -18,7 +8,7 @@
 #include <vtkm/worklet/particleadvection/ParticleAdvectionWorklets.h>
 #include <vtkm/worklet/particleadvection/Particles.h>
 
-#include <vtkm/io/reader/BOVDataSetReader.h>
+#include <vtkm/io/reader/VTKDataSetReader.h>
 
 #include <chrono>
 #include <vector>
@@ -57,7 +47,7 @@ void RunTest(const std::string& fname,
   using FieldType = vtkm::Float32;
   using FieldHandle = vtkm::cont::ArrayHandle<vtkm::Vec<FieldType, 3>>;
 
-  vtkm::io::reader::BOVDataSetReader rdr(fname);
+  vtkm::io::reader::VTKDataSetReader rdr(fname);
   vtkm::cont::DataSet ds = rdr.ReadDataSet();
 
   using RGEvalType = vtkm::worklet::particleadvection::GridEvaluator<FieldHandle>;
@@ -66,8 +56,12 @@ void RunTest(const std::string& fname,
   vtkm::cont::ArrayHandle<vtkm::Vec<FieldType, 3>> fieldArray;
   ds.GetField(0).GetData().CopyTo(fieldArray);
 
-  RGEvalType eval(ds.GetCoordinateSystem(), ds.GetCellSet(0), fieldArray);
+std::cout << "copied input data to ArrayHandle" << std::endl;
+
+  RGEvalType eval(ds.GetCoordinateSystem(), ds.GetCellSet(), fieldArray);
   RK4RGType rk4(eval, stepSize);
+
+std::cout << "The RGEval and RK4 stuff worked I guess..." << std::endl;
 
   std::vector<vtkm::Vec<FieldType, 3>> seeds;
   srand(314);
@@ -118,6 +112,8 @@ void RunTest(const std::string& fname,
     }
   }
 
+std::cout << "setting bounds worked..." << std::endl;
+
   for (int i = 0; i < numSeeds; i++)
   {
     vtkm::Vec<FieldType, 3> p;
@@ -129,6 +125,8 @@ void RunTest(const std::string& fname,
     p[2] = static_cast<FieldType>(bounds.Z.Min + rz * bounds.Z.Length());
     seeds.push_back(p);
   }
+
+std::cout << "setting up seeds vector worked..." << std::endl;
 
 #ifdef BUILDING_TBB_VERSION
   int nT = tbb::task_scheduler_init::default_num_threads();
@@ -146,6 +144,8 @@ void RunTest(const std::string& fname,
   vtkm::cont::ArrayHandle<vtkm::Vec<FieldType, 3>> seedArray;
   seedArray = vtkm::cont::make_ArrayHandle(seeds);
 
+std::cout << "stuff right up until PA run worked..." << std::endl;
+
   if (advectType == 0)
   {
     vtkm::worklet::ParticleAdvection particleAdvection;
@@ -156,6 +156,8 @@ void RunTest(const std::string& fname,
     vtkm::worklet::Streamline streamline;
     streamline.Run(rk4, seedArray, numSteps);
   }
+
+std::cout << "it would be really weird if i got here..." << std::endl;
 
   auto t1 = std::chrono::high_resolution_clock::now() - t0;
   auto runtime = std::chrono::duration_cast<std::chrono::milliseconds>(t1).count();
@@ -303,4 +305,3 @@ int main(int argc, char** argv)
   RunTest(dataFile, numSeeds, numSteps, stepSize, numThreads, advectType, seeding);
   return 0;
 }
-
