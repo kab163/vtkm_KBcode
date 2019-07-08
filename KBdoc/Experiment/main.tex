@@ -1,14 +1,21 @@
 \documentclass{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage{authblk}
+\usepackage{graphicx}
+\usepackage[backend=bibtex,style=verbose-trad2]{biblatex}
 \title{Adaptive Execution of Particle Advection Workloads}
-\author{Kristi Belcher}
+\author[*]{Kristi Belcher}
+\author[*]{Hank Childs}
+\author[**]{Dan the Ghost}
+\affil[*]{University of Oregon}
+\affil[**]{Oak Ridge National Lab}
 
 \begin{document}
 \maketitle
 %
 %%%%%%%%%%%%%ABSTRACT%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Abstract}
-Particle Advection is a fundamental flow visualiation calculation with widely varying workloads. 
+\textbf{\textit{Abstract-} Particle Advection is a fundamental flow visualiation calculation with widely varying workloads. 
 %
 Determining the optimal architecture to run these workloads on is a critical consideration. 
 %
@@ -24,7 +31,7 @@ We then compare our algorithm to traditional GPU-only and CPU-only approaches.
 %
 Our findings show X, Y, and Z.
 %
-The results of this study will help inform the Scientific Visualiaiton community about those architectures that give optimal performance at certain stages of the simulation run.
+The results of this study will help inform the Scientific Visualiaiton community about those architectures that give optimal performance at certain stages of the simulation run.}
 %
 %%%%%%%%%%%%%INTRODUCTION%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,7 +52,7 @@ As simulations currently being studied require more and more data to produce mea
 (i.e. visualization performed as the simulation is running, even using the same resources).
 %
 As simulations become larger, running programs like Particle Advection on modern supercomputers becomes a requirement for reasonable results.
-%
+
 (2) Intro for vtk-m. Talk about portable performance and hardware agnostic. Should mention varying architectures on supercomputers.
 %
 Modern supercomputers have varied computational capabilities that make tailoring algorithms to those architectures a priority.
@@ -62,7 +69,7 @@ In order to more effectively harness the computation power available on a superc
 %
 This kind of hybrid computing requires that researchers tailor their codes to two (or more in some cases)  architectures at a time.
 %
-To help ease the transition of efficiently using multiple hardwares, VTK-m was created to provide a hardware agnostic framework that acts as a bridge between several different plateforms - cite.
+To help ease the transition of efficiently using multiple hardwares, VTK-m was created to provide a hardware agnostic framework that acts as a bridge between several different plateforms \cite{Camp13}.
 %
 VTK-m is an extension of VTK, with the addition of several many-core implementations for common visualization algorithms.
 %
@@ -75,7 +82,7 @@ In (b), the developer only has to implement one VTK-m program to be able to util
 Portable performance sentence here.
 %
 supercomputers.
-%
+
 (3) What we hope to gain from this study. What the focus of the study is. More general description of goal of paper. 
 Mention research question.
 %
@@ -94,7 +101,7 @@ This would lead to the speculation that leaving the data on the CPU to be comput
 At other times, the workload may be much more able to fully load the GPU and take advantage of its hardware abilities.
 %
 In effect, our work explores the fundamental research question: \textbf{If faced with a Particle Advection problem, can adaptive execution give better performance than running the entire workload on either the CPU or the GPU?}
-%
+
 (4) Other important contribution of the paper. Why should we care? What this study means to overall community.
 %
 Other important contributions of this paper include the insights it provides for visualization scientists who are studying Particle Advection and other flow visualizaiton problems.
@@ -209,20 +216,31 @@ Our experiments varied over 4 main factors:
 \item \textbf{Number of GPU Nodes}: We ran our experiments on Summit and Titan (and NERSC?). (cite something) They have different GPUs like X, Y, and Z. Talk about node architecture!
 \end{itemize}
 %
-Cite a bunch of stuff here.
+Cite a bunch of stuff here. Testing - \cite{Camp12}
 %
-The experiments were within the VTK-m framework. Mention vtk-h?
+The experiments were within the VTK-m framework. Mention vtk-h? Testing - \cite{Pugmire:SC09}
 %
-Runtime environment and measurements taken...
+Runtime environment and measurements taken...Testing - \cite{Kress16}
 %
 %%%%%%%%%%%%%%%RESULTS%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
-We had a bunch of cool results.
+Our results showed that we can get similar or much better performance with our algorithm compared to the traditional approach. In fact, in the best case, we see a performance speedup of up to 1.5.
 \begin{center}
  Perhaps eventually put a diagram here.
 \end{center}
+%
+\begin{figure}
+  \includegraphics[width=\linewidth]{chichi.jpg}
+  \caption{A Chihuahua.}
+  \label{fig:chichi}
+\end{figure}
+%
+Figure \ref{fig:chichi} shows the best kind of dog.
+%
 We can make lots of analysis.
+%
+Something about cool insight that would be interesting to Scientific Visualizaiton researchers.
 %
 Comparison of results to others? 
 %
@@ -230,7 +248,7 @@ Major comparison to "Particle Advection Performance Over Varied Architectures an
 %
 %%%%%%%%%%%%%CONCLUSION%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Conclusion}
+\section{Conclusions and Future Work}
 We studied the affects of adaptive device selection during a vtk-m Particle Advection run. 
 %
 We have shown that by analyzing the current workload and selecting an appropriate device, we get better performance over the traditional single-device alternatives. 
@@ -240,21 +258,28 @@ Our findings suggest that adaptively selecting an appropriate device can also le
 We hope to get this paper published and solve world hunger while we're at it.
 %
 Should we do a summary of findings?
+
+My work described in this paper highlights the performance benefits and insights that I accomplished using specifically the Particle Advection algorithm.
 %
-%%%%%%%%%%%FUTURE WORK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Future Work}
-We have lots of future work ideas. 
+For our future work, it would be beneficial to see how this idea could be extended to other Scientific Visualizaiton algorithms.
 %
-They're superb.
+For example, can we see similar performance benefits with other similar algorithms?
+%
+What about algorithms which have more irregular control flows or memory access patterns?
+%
+There are several interesting research questions that can be explored by extending this idea to other kinds of problems.
+%
+More on this later.
 %
 %%%%%%%%%%%%ACKNOWLEDGEMENTS%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Acknowledgements}
-We have lots of people to acknowledge. 
+I would like to give a special thanks to the Scientific Visualization group at Oak Ridge National Labratory for their help and computational resources.
 %
-Whoop whoop.
+My work was made possible by many researchers in the group, which I very much appreciate.
 %
-Eventually we will have a references section...
-%
+Other thanks?
+
+\bibliography{references}
+\bibliographystyle{ieeetr}
 \end{document}
