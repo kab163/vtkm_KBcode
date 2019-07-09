@@ -3,7 +3,7 @@ BIB=main.aux
 
 main.pdf: 
 	latexmk -pdf $(SRC)
-	biblatex $(BIB)
+	bibtex $(BIB)
 	latexmk -pdf $(SRC)
 
 clean:	
