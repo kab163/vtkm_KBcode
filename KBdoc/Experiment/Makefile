@@ -7,5 +7,5 @@ main.pdf:
 	latexmk -pdf $(SRC)
 
 clean:	
-	rm *.pdf *.aux *.log *.fls
+	rm *.pdf *.aux *.log *.fls *.bbl *.blg
 
