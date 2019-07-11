@@ -38,33 +38,40 @@ The results of this study will help inform the Scientific Visualiaiton community
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 %
-(1) Intro for particle advection. What it does, why it's useful. Streamline vs. FTLE?
-%
 Particle Advection is a fundamental scientific visualization algorithm that calculates the displacement of particles along a velocity field - cite. 
 %
 This algorithm is a key element of flow analysis, commonly used to compute streamlines, pathlines, stream surfaces, and even Finite-Time Lyapunov Exponents (FTLE) - cite.
 %
+\textbf{Describe the PA algorithm a little bit, and give some background on the queues - this will be important for understanding that it is a critical algorithm to get efficient in a large-data environment.}
+%
+\textbf{The Particle Advection algorithm involves three queues: active, inactive, and terminated.}
+%
+\textbf{During the simulation, particles are advecting and evolving through the problem domain.}
+%
+\textbf{As the particles are advecting, they can either terminate, go outside the domain and become inactive, or move into the domain becoming active.}
+%
 Although Particle Advection is such an important calculation for vector field visualizaiton, implementing an efficient large-scale parallel Particle Advection computation remains a challenge.
 %
-Because particle trajectories can vary greatly, Particle Advection is a data dependent problem that requires variable computational resources to sucessfully trace the particle streams.
+Because particle trajectories can vary greatly, depending on different parameters set for the simulation.
 %
-As simulations currently being studied require more and more data to produce meaningful results, visualization and analysis is being performed in situ - cite.
+For example, termination criteria for particles is user defined and thus can be very different from one run to the next.
 %
-(i.e. visualization performed as the simulation is running, even using the same resources).
+Thus, Particle Advection is a data dependent problem that requires variable computational resources to sucessfully trace the particle streams.
 %
-As simulations become larger, running programs like Particle Advection on modern supercomputers becomes a requirement for reasonable results.
+As simulations require more and more data to produce meaningful results, visualization and analysis is being performed in situ - cite.
+%
+This means that the visualizations are performed as the simulation is running, even using the same resources.
+%
+Running large-scale Particle Advection simulations on modern supercomputers has become a requirement for reasonable results.
 
-(2) Intro for vtk-m. Talk about portable performance and hardware agnostic. Should mention varying architectures on supercomputers.
 %
 Modern supercomputers have varied computational capabilities that make tailoring algorithms to those architectures a priority.
 %
-The supercomputers that researchers must work with have widely differing architectures.
-%
-From modest computational power to very high computational power, with several architectures that lie in between - cite?.
+The supercomputers that researchers must work with have widely differing architectures that range from modest computational power to very high computational power, with several architectures that lie in between - cite?.
 %
 Because of this trend, it is important to take into consideration the kind of architecture that a simulation code will be run on. 
 %
-Sometimes, however, it is not as simple as just one of these kinds of archtiectures for a specific code.
+Sometimes, however, it is not as simple as just picking one of these kinds of archtiectures for a specific code.
 %
 In order to more effectively harness the computation power available on a supercomputer, many research scientists are utilizing several different kinds of architectures at one time, during the same run of a simulation code.
 %
@@ -74,7 +81,13 @@ To help ease the transition of efficiently using multiple hardwares, VTK-m was c
 %
 VTK-m is an extension of VTK, with the addition of several many-core implementations for common visualization algorithms.
 %
-Figure 1 shows a pictoral representation of how VTK-m can be used - cite. 
+\begin{figure}
+  \includegraphics[width=\linewidth]{VTKmLogo.png}
+  \caption{A placeholder for a real vtkm picture later.}
+  \label{fig:vtkm}
+\end{figure}
+%
+Figure \ref{fig:vtkm} shows a pictoral representation of how VTK-m can be used - cite. 
 %
 Note that in (a) a developer must implement several versions of the application code: one for each desired harware platform.
 %
@@ -84,8 +97,6 @@ Portable performance sentence here.
 %
 supercomputers.
 
-(3) What we hope to gain from this study. What the focus of the study is. More general description of goal of paper. 
-Mention research question.
 %
 In this study, we analyze the performance impact of utilizing more than just one architecture during the same run of a VTK-m Particle Advection program.
 %
@@ -93,7 +104,7 @@ We contribute a new Particle Advection algorithm which uses an oracle to determi
 %
 As the workload evolves, our algorithm can switch back and forth from CPU to GPU depending on which device's hardware resources can be best utilized.
 %
-We compare the performance between programs which uses either only the CPU or only the GPU to produce results and our program which adaptively selects a device during execution depending on the current state of the workload. 
+We compare the performance between programs which use either CPU-only or GPU-only to produce results and our program which adaptively selects a device during execution. 
 %
 Our algorithm is motivated by the observation that sometimes the workload can't take full advantage of GPU threads, leading to some sitting idle and wasting resources.
 %
@@ -103,7 +114,6 @@ At other times, the workload may be much more able to fully load the GPU and tak
 %
 In effect, our work explores the fundamental research question: \textbf{If faced with a Particle Advection problem, can adaptive execution give better performance than running the entire workload on either the CPU or the GPU?}
 
-(4) Other important contribution of the paper. Why should we care? What this study means to overall community.
 %
 Other important contributions of this paper include the insights it provides for visualization scientists who are studying Particle Advection and other flow visualizaiton problems.
 %
