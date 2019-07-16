@@ -7,6 +7,7 @@
 \title{Adaptive Execution of Particle Advection Workloads}
 \author[*]{Kristi Belcher}
 \author[*]{Hank Childs}
+\author[**]{Dave Pugmire}
 \author[**]{Dan the Ghost}
 \affil[*]{University of Oregon}
 \affil[**]{Oak Ridge National Lab}
@@ -38,9 +39,9 @@ The results of this study will help inform the Scientific Visualiaiton community
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 %
-Particle Advection is a fundamental scientific visualization algorithm that calculates the displacement of particles along a velocity field - cite. 
+Particle Advection is a fundamental scientific visualization algorithm that calculates the displacement of particles along a velocity field. 
 %
-This algorithm is a key element of flow analysis, commonly used to compute streamlines, pathlines, stream surfaces, and even Finite-Time Lyapunov Exponents (FTLE) - cite.
+This algorithm is a key element of flow analysis, commonly used to compute streamlines, pathlines, stream surfaces, and even Finite-Time Lyapunov Exponents (FTLE).
 %
 \textbf{Describe the PA algorithm a little bit, and give some background on the queues - this will be important for understanding that it is a critical algorithm to get efficient in a large-data environment.}
 %
@@ -52,17 +53,17 @@ This algorithm is a key element of flow analysis, commonly used to compute strea
 %
 Although Particle Advection is such an important calculation for vector field visualizaiton, implementing an efficient large-scale parallel Particle Advection computation remains a challenge.
 %
-Because particle trajectories can vary greatly, depending on different parameters set for the simulation.
+Moreover, particle trajectories can vary greatly depending on different parameters set for the simulation.
 %
 For example, termination criteria for particles is user defined and thus can be very different from one run to the next.
 %
 Thus, Particle Advection is a data dependent problem that requires variable computational resources to sucessfully trace the particle streams.
 %
-As simulations require more and more data to produce meaningful results, visualization and analysis is being performed in situ - cite.
+As simulations require more and more data to produce meaningful results, visualization and analysis is being performed in situ.
 %
-This means that the visualizations are performed as the simulation is running, even using the same resources.
+This means that the data is generated and the visualizations are performed as the simulation is running, even using the same resources.
 %
-Running large-scale Particle Advection simulations on modern supercomputers has become a requirement for reasonable results.
+Running large-scale Particle Advection simulations on modern supercomputers has become a requirement for efficient results in a reasonable amount of time.
 
 %
 Modern supercomputers have varied computational capabilities that make tailoring algorithms to those architectures a priority.
@@ -77,7 +78,7 @@ In order to more effectively harness the computation power available on a superc
 %
 This kind of hybrid computing requires that researchers tailor their codes to two (or more in some cases)  architectures at a time.
 %
-To help ease the transition of efficiently using multiple hardwares, VTK-m was created to provide a hardware agnostic framework that acts as a bridge between several different plateforms \cite{Camp13}.
+To help ease the transition of efficiently using multiple hardwares, VTK-m was created to provide a hardware agnostic framework that acts as a bridge between several different plateforms \cite{Moreland16}.
 %
 VTK-m is an extension of VTK, with the addition of several many-core implementations for common visualization algorithms.
 %
@@ -93,9 +94,9 @@ Note that in (a) a developer must implement several versions of the application 
 %
 In (b), the developer only has to implement one VTK-m program to be able to utilize any compatible architecture.
 %
-Portable performance sentence here.
+VTK-m creates a hardware agnostic environment using data parallel primitives.
 %
-supercomputers.
+Additionally, VTK-m supports general portablility across a wide variety of architectures, thus making portable performance possible.
 
 %
 In this study, we analyze the performance impact of utilizing more than just one architecture during the same run of a VTK-m Particle Advection program.
@@ -122,6 +123,14 @@ For example, in implementing an oracle to efficiently determine the best device 
 These characteristics included (1) number of particles left in the domain to advect, (2) how many times a particular particle has been switched to a different device, and (3) how many times a particular particle when back and forth from active queue to inactive queue.
 %
 These considerations were important for scultping an oracle that could best determine the appropriate device for the workload, and thus will give other researchers interesting insight into the factors that affect which architectures will be best.
+%
+We make the following contributions.
+%
+We introduce a performance portable, VTK-m Particle Advection algorithm which utilizes both the CPU and the GPU depending on the current state of the workload to achieve a more efficient result.
+%
+We demonstrate how certain characteristics of the data set can be used as an oracle to determine the appropriate hardware for the current workload.
+%
+Additionally, we compare our results and findings with other implementations which only use the CPU or only the GPU and provide analysis of this insight.
 %
 The following sections describe our algorithm and results in more detail. 
 %
@@ -155,7 +164,9 @@ Mallony papers could help on this part...
 %%%%%%%%%%%PROBLEM and ALGORITHM OVERVIEW%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Problem and Algorithm Overview}
-Should include a Particle Advection Overview + OUR algorithm overview here. Maybe new section?
+In this section, we discuss the Particle Advection algorithm itself and several key aspects of the algorithm that we took into consideration when implementing our new algorithm. 
+%
+We also discuss our algorithm in detail, explaining our new contributions and the benefits of this implementation.
 %
 \subsection{Particle Advection Overview}
 Particle Advection starts by displacing a particle for a short distance in a velocity field.
@@ -178,26 +189,42 @@ In this study, our Particle Advection algorithm uses a parallelization-over-data
 %
 A particular task will execute particles on its piece of the domain until its assigned particles terminate or advect outside of its piece of the domain.
 %
-If a particle does travel beyond a task's domain to another piece, it is communicated to whatever task owns that piece of the domain.
+Here, a task will fork two threads: a manager thread to communication and keep track of overall progress and a worker thread to advect particles given to it by the manager.
+%
+If a particle does travel beyond a task's domain to another piece, it is communicated (by the manager thread) to whatever task owns that piece of the domain.
 %
 This process repeats until all particles have terminated.
 %
 At this point we can see the paths that each particle has traveled, giving us a map of the particles' trajectories.
 %
 \subsection{Algorithm Overview}
-Our study uses the algorithm introduced in (cite other paper).
-%
-Our algorithm is built off the one that is introduced in (cite other paper).
+Our study uses the algorithm introduced in \cite{Camp13}, described in section 2. (fix reference later)
 %
 Here, we will discuss only the important parts of the previous algorithm that will help readers understand how we've modified it to create our new algorithm.
 %
 Talk about initialization and advection phases + queues.
 %
-In addition, we've modified how the worker queue interacts with the manage queue, and we've added a distinctive CPU worker queue and a GPU worker queue. 
+The particle advection algorithm involves three queues: one for active particles, one for the inactive particles, and the last for terminated particles.
 %
-If our oracle determines that the workload is best suited for the GPU, then the manage thread will add work to the active worker queue to be run on the GPU.
+The active queue includes the particles that can be immidiately worked on and that are within the task's domain.
 %
-Otherwise, the manage thread will insert that work into the worker thread's active queue for the CPU.
+The inactive queue includes the particles that (have advected into a sink?) have gone outside the domain boundaries and must be communicated to another task.
+%
+Lastly, the terminated queue includes those particles that have met some termination criteria and are done advecting.
+%
+In this way, our algorithm mimicks that described in \cite{Camp13}.
+%
+However, we've modified how the worker queue interacts with the manage queue in our new algorithm, adding a distinctive CPU worker thread and a GPU worker thread. 
+%
+We want to take advantage of a GPU's hardware resources when the workload calls for it, but then switch to a GPU when the workload no longer can take full advantage of the GPU.
+%
+Here, we describe how exactly we have accomplished this novel idea (or some kind of transition).
+%
+First, all particles are initialized on the GPU worker thread's queue for simplicity.
+%
+After the first round of work, if our oracle determines that the workload is best suited for the GPU, then the manage thread will add work to the GPU worker thread's active queue.
+%
+Otherwise, the manage thread will insert that work into the CPU worker thread's active queue.
 %
 In this way, there is no conflicts within a single worker queue, but instead two separate queues that can be read depending on what the oracle determines about the current state of the workload.
 %
@@ -236,10 +263,9 @@ Runtime environment and measurements taken...Testing - \cite{Kress16}
 %%%%%%%%%%%%%%%RESULTS%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
-Our results showed that we can get similar or much better performance with our algorithm compared to the traditional approach. In fact, in the best case, we see a performance speedup of up to 1.5.
-\begin{center}
- Perhaps eventually put a diagram here.
-\end{center}
+Our results showed that we can get similar or much better performance with our algorithm compared to the traditional approach. 
+%
+In fact, in the best case, we see a performance speedup of up to 1.5x.
 %
 \begin{figure}
   \includegraphics[width=\linewidth]{chichi.jpg}
@@ -249,7 +275,19 @@ Our results showed that we can get similar or much better performance with our a
 %
 Figure \ref{fig:chichi} shows the best kind of dog.
 %
-We can make lots of analysis.
+Our major findings were....
+%
+Analysis of major findings, why it's interesting...
+%
+Our results demonstrate that our oracle was successful in deciding which device to run the current workload on.
+%
+The most crutial criteria for our oracle is a function of both the number of particles and the number of advection steps.
+%
+Our oracle was able to determine when the workload started "ping ponging" particles inbetween domain boundaries.
+%
+At this point, directing the code to be run on the CPU increased performance because the CPU threads could more efficiently process this behavior. (Talk about why)
+%
+More on why the oracle was good and what it actually did.
 %
 Something about cool insight that would be interesting to Scientific Visualizaiton researchers.
 %
@@ -260,7 +298,7 @@ Major comparison to "Particle Advection Performance Over Varied Architectures an
 %%%%%%%%%%%%%CONCLUSION%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions and Future Work}
-We studied the affects of adaptive device selection during a vtk-m Particle Advection run. 
+We studied the affects of adaptive device selection implementation of a vtk-m Particle Advection program. 
 %
 We have shown that by analyzing the current workload and selecting an appropriate device, we get better performance over the traditional single-device alternatives. 
 %
@@ -268,7 +306,7 @@ Our findings suggest that adaptively selecting an appropriate device can also le
 %
 We hope to get this paper published and solve world hunger while we're at it.
 %
-Should we do a summary of findings?
+Should we do a summary of findings? Itemize!
 
 My work described in this paper highlights the performance benefits and insights that I accomplished using specifically the Particle Advection algorithm.
 %
