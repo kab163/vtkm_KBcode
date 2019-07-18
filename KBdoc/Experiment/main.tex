@@ -139,9 +139,34 @@ The following sections describe our algorithm and results in more detail.
 %%%%%%%%%%%%RELATED WORK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Related Work}
-There are a few papers that survey flow visualization that would be good to include (3 in the other paper).
+In this section, we discuss related works grouped into two main areas: Particle Advection and Parallel Visualization Systems.
+
+\subsection{Particle Advection}
+Because processing integral lines has remained a key computation for Vector field visualization\cite{McLoughlin}, much work has explored how to make this calculation fast and efficient.
 %
-From here you can talk about porting these flow visualization algorithms to GPUs and studies that focus on that (4,5,6,7,8,9,10,11)
+Pugmire et. al. discussed two fundamental approaches to calculating the integral lines for vector field visualization.\cite{Pugmire:SC09}
+%
+First \textit{Parallelize-over-Seeds} (POS), involves distributing the particle seeds across nodes to be processed independent of each other.
+%
+POS often does not scale as well as the other approach because of redundant I/O operations.
+%
+This leads to the second approach, \textit{Parallelize-over-Blocks} (POB), where each node is assigned a block of the domain to process.
+%
+The node assigned to a particular block is in charge of calculating traces for any particles that enter its block.
+%
+However, it is easy to see how load balancing will become a problem for this approach as not all pieces of the domain have a proportional amount of work.
+%
+Therefore, it is common to adopt some kind of hybrid approach of both of these techniques to increase performance and alleviate the potential downfalls of each technique by itself.
+%
+Pugmire et. al. \cite{Pugmire12} explore this kind of algorithm in a distributed memory parallel environment.
+
+Camp et. al. \cite{Camp11} propose a MPI and OpenMP based solution where MPI is used to parallelize across mulitple nodes, and OpenMP is used to parallelize local advection calculations.
+%
+They propose this scheduling approach to manage how these two APIs interact.
+%
+Then in \cite{Camp13}, they propose a similar schedule with CUDA implementations substituted for OpenMP.
+%
+Here they analyze the performance impact between the two schedules.
 %
 Then mention Particle Advection specifically and how that pairs with parallel algorithms that are implemented on the GPU, CPU, and/or a cluster of the two.
 %
@@ -154,6 +179,11 @@ Mention David Camp (Pugmire, Childs) papers. (Paper used above + others)
 Other presentations on particle advection.
 %
 Could talk about the effects of hardware architecture on PA performance. (Section 2, parts C and D)
+
+\subsection{Parallel Visualization Systems}
+There are a few papers that survey flow visualization that would be good to include (3 in the other paper).
+%
+From here you can talk about porting these flow visualization algorithms to GPUs and studies that focus on that (4,5,6,7,8,9,10,11)
 %
 Should include something on CPU vs GPU performance and when one device is better than the other. (part D, others)
 %
@@ -266,6 +296,8 @@ Runtime environment and measurements taken...Testing - \cite{Kress16}
 Our results showed that we can get similar or much better performance with our algorithm compared to the traditional approach. 
 %
 In fact, in the best case, we see a performance speedup of up to 1.5x.
+%
+We did a lot of our analysis in Visit \cite{visit} which allowed us to verify our results and make other conclusions...yatta yatta.
 %
 \begin{figure}
   \includegraphics[width=\linewidth]{chichi.jpg}
