@@ -83,12 +83,18 @@ To help ease the transition of efficiently using multiple hardwares, VTK-m was c
 VTK-m is an extension of VTK, with the addition of several many-core implementations for common visualization algorithms.
 %
 \begin{figure}
-  \includegraphics[width=\linewidth]{VTKmLogo.png}
-  \caption{A placeholder for a real vtkm picture later.}
-  \label{fig:vtkm}
+  \includegraphics[width=8cm]{images/vtkm1.PNG}
+  \caption{A picture of how each algorithm must be ported to each architecture.}
+  \label{fig:vtkm1}
 \end{figure}
 %
-Figure \ref{fig:vtkm} shows a pictoral representation of how VTK-m can be used - cite. 
+\begin{figure}
+  \includegraphics[width=8cm]{images/vtkm2.PNG}
+  \caption{A picture of how with VTKm, each algorithm only has to be mapped once to VTKm.}
+  \label{fig:vtkm2}
+\end{figure}
+%
+Figure \ref{fig:vtkm1} and \ref{fig:vtkm2} shows a pictoral representation of how VTK-m can be used - cite. 
 %
 Note that in (a) a developer must implement several versions of the application code: one for each desired harware platform.
 %
@@ -168,28 +174,71 @@ Then in \cite{Camp13}, they propose a similar schedule with CUDA implementations
 %
 Here they analyze the performance impact between the two schedules.
 %
-Then mention Particle Advection specifically and how that pairs with parallel algorithms that are implemented on the GPU, CPU, and/or a cluster of the two.
+
+Other previous work focuses on optimizing the POB technique.
 %
-That is mentioned in section 2, parts C and D in that one paper.
+Yu et. al. \cite{Yu07} proposes a data-aware POB strategy.
 %
-Look at those references and see if you can't use them here too.
+Similarly, Nouanesengsy et. al. \cite{Shen11} use a statistical approach to calculate the propagration probability of particles across blocks.
 %
-Mention David Camp (Pugmire, Childs) papers. (Paper used above + others)
+They predict the movement of particles to more efficiently partition blocks across nodes.
 %
-Other presentations on particle advection.
+In their work, they explore the POB strategy and find a unique way to optimize it.
 %
-Could talk about the effects of hardware architecture on PA performance. (Section 2, parts C and D)
+Additionally, Nouanesengsy et. al. \cite{Nouanesengsy:12} also used time intervals as a way of optimizing how blocks get assigned to the different nodes.
+%
+With this approach they can more efficiently compute the Finite Time Lyapunov Exponent (FTLE) by distributing different time intervals to nodes and generating pathlines accordingly.
+%
+
+On the other hand, there are different approaches that use Information Gain and Entropy to predict blocks that will have more data versus those that will have few to no particles.
+%
+Marsaglia et. al. \cite {Marsaglia19} created an approach to calculate those blocks that contained more important data, and then used that information to assign blocks to MPI ranks.
+%
+Müller et. al. \cite{Muller13} proposed a \textit{work-requesting} scheduling scheme which alleviated much of the load imbalance problem of POB.
+%
+In their approach, blocks are assigned to nodes and when one node runs out of work to do on its assigned block, it sends a message to a neighboring block requesting half of its remaining work.
+%
+In this way, most of the load imbalance problem is solved unless there are other imbalance issues in other areas of the problem.
+ 
+%Then mention Particle Advection specifically and how that pairs with parallel algorithms that are implemented on the GPU, CPU, and/or a cluster of the two.
+%
+%That is mentioned in section 2, parts C and D in that one paper.
+%
+%Look at those references and see if you can't use them here too.
+%
+%Mention David Camp (Pugmire, Childs) papers. (Paper used above + others)
+%
+%Other presentations on particle advection.
+%
+%Could talk about the effects of hardware architecture on PA performance. (Section 2, parts C and D)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Parallel Visualization Systems}
-There are a few papers that survey flow visualization that would be good to include (3 in the other paper).
+In 1990, Blelloch proposed a model where specific operations could be carried out on vectors of size N in O(log(N) time in the worst case \cite{Blelloch}.
 %
-From here you can talk about porting these flow visualization algorithms to GPUs and studies that focus on that (4,5,6,7,8,9,10,11)
+This worked inspired the use of Data Parallel Primitives (DPPs) such as Scan, Scatter, Map, Reduce, and Gather used in libraries like NVIDIA's Thrust \cite{Thrust} library.
 %
-Should include something on CPU vs GPU performance and when one device is better than the other. (part D, others)
+Since The Thurst library uses DPPs, it can be compiled to work across a variety of parallel architectures.
 %
-Perhaps go into more details on problems that are better for GPU hardware vs problems that are better for CPU hardware.
+Additionally, DPPs are also used as the basis for different performance-portable libraries such as VTK-m \cite{Moreland16}.
 %
-Mallony papers could help on this part...
+VTKm is a hardware agnostic solution for implementing key visualization algorithms across a wide range of platforms.
+%
+As modern supercomputers are equipped with a wider range of hardware varieties, from programmable graphics processors (GPUs) and many-core co-processors (Intel Xeon Phi) to large multi-core CPUs, a growing concern for Visualization software developers remains providing optimized software that can employ many different algorithms.
+%
+As such, VTKm helps alleviate this problem, providing software developers with the ability to write a single implementation of their code and have it run on a variety of architectures obtaining excellent performance on each distinct platform.
+%
+In short, VTKm was created to provide the same functionalities as VTK \cite{vtk}, but with the inclusion of achieving portable performance across a variety of many-core and multi-core architectures.
+%
+%There are a few papers that survey flow visualization that would be good to include (3 in the other paper).
+%
+%From here you can talk about porting these flow visualization algorithms to GPUs and studies that focus on that (4,5,6,7,8,9,10,11)
+%
+%Should include something on CPU vs GPU performance and when one device is better than the other. (part D, others)
+%
+%Perhaps go into more details on problems that are better for GPU hardware vs problems that are better for CPU hardware.
+%
+%Mallony papers could help on this part...
 %
 %%%%%%%%%%%PROBLEM and ALGORITHM OVERVIEW%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -300,14 +349,34 @@ In fact, in the best case, we see a performance speedup of up to 1.5x.
 We did a lot of our analysis in Visit \cite{visit} which allowed us to verify our results and make other conclusions...yatta yatta.
 %
 \begin{figure}
-  \includegraphics[width=\linewidth]{chichi.jpg}
+  \includegraphics[width=\linewidth]{images/chichi.jpg}
   \caption{A Chihuahua.}
   \label{fig:chichi}
 \end{figure}
 %
 Figure \ref{fig:chichi} shows the best kind of dog.
 %
-Our major findings were....
+\begin{figure}
+  \includegraphics[width=3cm]{images/hydraulics.png}
+  \caption{A picture of the Hydraulics data set.}
+  \label{fig:hydr}
+\end{figure}
+%
+\begin{figure}
+  \includegraphics[width=3cm]{images/Supernova_Astro.png}
+  \caption{A picture of the Astrophysics data set.}
+  \label{fig:nova}
+\end{figure}
+%
+\begin{figure}
+  \includegraphics[width=3cm]{images/Fusion.png}
+  \caption{A picture of the Fusion data set.}
+  \label{fig:fus}
+\end{figure}
+%
+Our major findings were....some cool pictures! 
+%
+Figure \ref{fig:hydr}, \ref{fig:nova}, and \ref{fig:fus} show pictures of the data sets we used.
 %
 Analysis of major findings, why it's interesting...
 %
